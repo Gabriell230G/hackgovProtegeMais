@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protege+ | Canal Nacional de Denúncias</title>
+  <link rel="shortcut icon" href="./images/Logo Protege+ Gov.png" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    /* ── DARK MODE ── */
+    [data-theme="dark"] {
+      --blue-dark: #60a5fa;
+      --blue-main: #3b82f6;
+      --blue-light: #93c5fd;
+      --gray-50: #1e293b;
+      --gray-100: #1e293b;
+      --gray-200: #334155;
+      --gray-300: #475569;
+      --gray-400: #64748b;
+      --gray-500: #94a3b8;
+      --gray-600: #cbd5e1;
+      --gray-700: #e2e8f0;
+      --gray-800: #f1f5f9;
+      --shadow: 0 4px 20px rgba(0,0,0,.4);
+    }
+    [data-theme="dark"] body { background: #0f172a; color: #e2e8f0; }
+    [data-theme="dark"] .navbar { background: #1e293b; border-bottom: 1px solid #334155; }
+    [data-theme="dark"] .form-container,
+    [data-theme="dark"] .chart-card,
+    [data-theme="dark"] .table-card,
+    [data-theme="dark"] .faq-item,
+    [data-theme="dark"] .feature-card,
+    [data-theme="dark"] .tipo-card,
+    [data-theme="dark"] .denuncia-card,
+    [data-theme="dark"] .login-box,
+    [data-theme="dark"] .modal,
+    [data-theme="dark"] .status-search-box { background: #1e293b !important; border-color: #334155 !important; color: #e2e8f0; }
+    [data-theme="dark"] .sidebar { background: #1e293b; border-right: 1px solid #334155; }
+    [data-theme="dark"] .dashboard-main { background: #0f172a; }
+    [data-theme="dark"] input,
+    [data-theme="dark"] select,
+    [data-theme="dark"] textarea { background: #0f172a !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+    [data-theme="dark"] .kpi-card { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] table thead { background: #1e293b; }
+    [data-theme="dark"] table tbody tr:hover { background: #334155; }
+    [data-theme="dark"] .upload-area { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] footer { background: #1e293b; border-top: 1px solid #334155; }
+    [data-theme="dark"] .faq-answer { background: #0f172a; }
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3,
+    [data-theme="dark"] h4, [data-theme="dark"] label, [data-theme="dark"] p { color: #e2e8f0; }
+    [data-theme="dark"] .section-title { color: #e2e8f0; }
+    [data-theme="dark"] .detail-section { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] .notification-item { background: #0f172a; }
+    [data-theme="dark"] .hero { background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%); }
+    [data-theme="dark"] .tipos-section, [data-theme="dark"] .how-section { background: #0f172a; }
+    [data-theme="dark"] .step,
+    [data-theme="dark"] .step-inner { background: #0f172a !important; border-color: #334155 !important; }
+    [data-theme="dark"] .step h4 { color: #e2e8f0 !important; }
+    [data-theme="dark"] .step p { color: #94a3b8 !important; }
+    [data-theme="dark"] .step-arrow { color: #475569 !important; }
+    [data-theme="dark"] .steps-container { background: #0f172a !important; }
+    /* Denúncia card — contraste suavizado */
+    [data-theme="dark"] .denuncia-card { background: #1e293b !important; }
+    [data-theme="dark"] .denuncia-header { background: #0f172a !important; border-color: #334155 !important; }
+    [data-theme="dark"] .denuncia-meta { background: #0f172a !important; border-color: #334155 !important; }
+    [data-theme="dark"] .protocol-id { color: #60a5fa !important; }
+    [data-theme="dark"] .detail-row { border-color: #334155 !important; }
+    [data-theme="dark"] .detail-row strong { color: #93c5fd !important; }
+    [data-theme="dark"] .detail-row span { color: #cbd5e1 !important; }
+    [data-theme="dark"] .notification-item { background: #0f172a !important; border-color: #334155 !important; }
+    [data-theme="dark"] .status-step { color: #94a3b8 !important; }
+    [data-theme="dark"] .status-step.active .status-step-label { color: #60a5fa !important; }
+    [data-theme="dark"] .status-step.done .status-step-label { color: #4ade80 !important; }
+    [data-theme="dark"] .features-section { background: #1e293b; }
+    [data-theme="dark"] .emergency-section { background: #0f172a; }
+    .idioma-btn.active { background: var(--blue-dark) !important; color: white !important; border-color: var(--blue-dark) !important; }
+    [data-theme="dark"] .idioma-btn { color: #e2e8f0; border-color: #334155; }
+        /* Status steps dark mode */
+    [data-theme="dark"] .status-step-icon { background: #334155 !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+    [data-theme="dark"] .status-step.done .status-step-icon { background: #2563eb !important; border-color: #2563eb !important; }
+    [data-theme="dark"] .status-step.active .status-step-icon { background: #d97706 !important; border-color: #d97706 !important; }
+    [data-theme="dark"] .status-step-label { color: #94a3b8 !important; }
+    [data-theme="dark"] .status-step.done .status-step-label { color: #60a5fa !important; }
+    [data-theme="dark"] .status-step.active .status-step-label { color: #fbbf24 !important; }
+    [data-theme="dark"] .status-step-date { color: #64748b !important; }
+    [data-theme="dark"] .status-tracker { border-color: #334155 !important; }
+    [data-theme="dark"] .status-step:not(:last-child)::after { background: #334155 !important; }
+    [data-theme="dark"] .status-step.done:not(:last-child)::after { background: #2563eb !important; }
+    /* Chatbot dark mode — texto legível */
+    [data-theme="dark"] .chat-msg.bot .msg-bubble { background: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+    [data-theme="dark"] .chat-menu-btn { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+    [data-theme="dark"] .chat-menu-btn:hover { background: #1e3a8a !important; border-color: #2563eb !important; color: #93c5fd !important; }
+    [data-theme="dark"] .chat-opt-btn { background: #1e293b !important; color: #93c5fd !important; border-color: #2563eb !important; }
+    [data-theme="dark"] .chat-opt-btn:hover { background: #2563eb !important; color: white !important; }
+    [data-theme="dark"] .msg-bubble strong,
+    [data-theme="dark"] .msg-bubble a { color: #93c5fd !important; }
+        /* Páginas de política e ética */
+    [data-theme="dark"] .policy-content { background: #0f172a !important; color: #e2e8f0 !important; }
+    [data-theme="dark"] .policy-content h1 { color: #e2e8f0 !important; }
+    [data-theme="dark"] .policy-intro { color: #cbd5e1 !important; }
+    [data-theme="dark"] .policy-card { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .policy-section h2 { color: #60a5fa !important; }
+    [data-theme="dark"] .policy-section p,
+    [data-theme="dark"] .policy-section li { color: #cbd5e1 !important; }
+    [data-theme="dark"] .policy-date { color: #64748b !important; }
+    [data-theme="dark"] .policy-section ul { color: #cbd5e1 !important; }
+    /* Footer */
+    [data-theme="dark"] .footer-copy { color: #64748b !important; }
+    [data-theme="dark"] .footer-link { color: #93c5fd !important; }
+    [data-theme="dark"] .footer-link:hover { color: #60a5fa !important; }
+    /* Botão idioma */
+    [data-theme="dark"] #btn-idioma { border-color: #334155 !important; }
+    [data-theme="dark"] #btn-idioma:hover { border-color: #60a5fa !important; }
+        [data-theme="dark"] .safe-mode-overlay { background: #0f172a; }
+    /* Formulário */
+    [data-theme="dark"] .form-section { background: #0f172a !important; }
+    [data-theme="dark"] .form-section .section-title { color: #e2e8f0 !important; }
+    [data-theme="dark"] .form-section .section-title span { color: #60a5fa !important; }
+    /* Chatbot */
+    [data-theme="dark"] .chatbot-window { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .chatbot-messages { background: #0f172a !important; }
+    [data-theme="dark"] .chat-msg .msg-bubble { background: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+    [data-theme="dark"] .chat-msg.bot .msg-bubble { background: #1e293b !important; color: #e2e8f0 !important; }
+    [data-theme="dark"] .chat-msg.user .msg-bubble { background: #2563eb !important; color: white !important; }
+    [data-theme="dark"] .chatbot-input { background: #1e293b !important; border-top-color: #334155 !important; }
+    [data-theme="dark"] .chatbot-input input { background: #0f172a !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+    [data-theme="dark"] .chat-options .option-btn { background: #1e293b !important; border-color: #334155 !important; color: #93c5fd !important; }
+    [data-theme="dark"] .chat-options .option-btn:hover { background: #2563eb !important; color: white !important; }
+    [data-theme="dark"] .typing-dots { background: #1e293b !important; border-color: #334155 !important; }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== SAFE MODE OVERLAY ===== -->
+<div class="safe-mode-overlay" id="safe-mode-overlay">
+  <div class="safe-topbar">
+    <button class="safe-back-btn" id="safe-back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+  </div>
+  <div class="safe-center">
+    <div class="safe-logo"><span class="s">S</span><span class="e">e</span><span class="a">a</span><span class="r">r</span><span class="c">c</span><span class="h">h</span></div>
+    <div class="safe-search-wrap">
+      <div class="safe-input-wrap">
+        <input type="text" id="safe-search-input" placeholder="Pesquisar na web" autocomplete="off">
+        <button id="safe-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+      <div class="safe-suggestions" id="safe-suggestions"></div>
+    </div>
+    <div class="safe-links">
+      <a href="https://mail.google.com" target="_blank">Gmail</a>
+      <a href="https://www.google.com/imghp" target="_blank">Imagens</a>
+      <a href="https://news.google.com" target="_blank">Notícias</a>
+      <a href="https://maps.google.com" target="_blank">Maps</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: LANDING ===== -->
+<div class="page active" id="page-landing">
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="navigate('landing')">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="navbar-links">
+      <button class="nav-link" onclick="scrollToSection('tipos')" data-i18n="nav.tipos">Tipos de denúncia</button>
+      <button class="nav-link" onclick="scrollToSection('como')" data-i18n="nav.como">Como funciona</button>
+      <button class="nav-link" onclick="scrollToSection('formulario')" data-i18n="nav.fazer">Fazer Denúncia</button>
+      <button class="nav-link" onclick="navigate('status')" data-i18n="nav.status">Status da Denúncia</button>
+    </div>
+    <div class="navbar-actions">
+      <button id="btn-idioma" onclick="I18n.alternar()"
+        title="Mudar idioma"
+        style="width:36px;height:26px;border:2px solid var(--gray-200);border-radius:6px;cursor:pointer;background:transparent;padding:0;overflow:hidden;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:18px;"
+        onmouseover="this.style.borderColor='var(--blue-dark)';this.style.transform='scale(1.1)'"
+        onmouseout="this.style.borderColor='var(--gray-200)';this.style.transform='scale(1)'">
+        🇧🇷
+      </button>
+      <button class="btn btn-ghost btn-sm btn-dark-toggle" onclick="toggleDarkMode()" title="Modo Escuro"><i class="fa-solid fa-moon"></i></button>
+      <button class="btn btn-ghost btn-sm nav-hide-mobile" onclick="SafeMode.activate()" title="Modo Seguro">
+        <i class="fa-solid fa-eye-slash"></i data-i18n="nav.seguro"> Modo Seguro
+      </button>
+      <button class="btn btn-primary btn-sm nav-hide-mobile" onclick="navigate('login')" data-i18n="nav.servidor_btn">🏛 Área do Servidor</button>
+      <!-- Hamburger -->
+      <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Menu mobile -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="mobile-nav-link" onclick="scrollToSection('tipos');closeMobileMenu()" data-i18n="nav.tipos">Tipos de denúncia</button>
+    <button class="mobile-nav-link" onclick="scrollToSection('como');closeMobileMenu()" data-i18n="nav.como">Como funciona</button>
+    <button class="mobile-nav-link" onclick="scrollToSection('formulario');closeMobileMenu()" data-i18n="nav.fazer">Fazer Denúncia</button>
+    <button class="mobile-nav-link" onclick="navigate('status');closeMobileMenu()" data-i18n="nav.status">Status da Denúncia</button>
+    <div class="mobile-menu-divider"></div>
+    <button class="mobile-nav-link" onclick="SafeMode.activate();closeMobileMenu()">
+      <i class="fa-solid fa-eye-slash"></i> <span data-i18n="nav.seguro">Modo Seguro</span>
+    </button>
+    <button class="mobile-nav-link mobile-nav-primary" onclick="navigate('login');closeMobileMenu()" data-i18n="nav.servidor_btn">🏛 Área do Servidor</button>
+  </div>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge" data-i18n="hero.badge">🏛 Canal Nacional Oficial</div>
+      <h1>Protege+<br><span data-i18n="hero.titulo">Canal Nacional de Denúncias</span></h1>
+      <p data-i18n="hero.sub">Faça o registro de situações de violência, abuso e risco de forma segura e, se desejar, de maneira anônima.</p>
+      <div class="hero-actions">
+        <button class="btn btn-lg" style="background:white;color:var(--blue-dark);" onclick="scrollToSection('formulario')" data-i18n="hero.btn">📝 Fazer denúncia</button>
+        <button class="btn btn-yellow btn-lg" onclick="navigate('status')" data-i18n="hero.btn2">🔍 Ver Status da Denúncia</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-lock" style="color:white"></i></div><div><h4 data-i18n="feat.dados">Proteção de Dados</h4><p data-i18n="feat.dados.sub">✓ Sigilo garantido</p></div></div>
+      <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-landmark" style="color:white"></i></div><div><h4 data-i18n="feat.canal">Canal Oficial</h4><p data-i18n="feat.canal.sub">✓ Canal direto com autoridades</p></div></div>
+      <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-user-shield" style="color:white"></i></div><div><h4 data-i18n="feat.anon">Denúncia Anônima</h4><p data-i18n="feat.anon.sub">✓ Envio sem identificação</p></div></div>
+      <div class="feature-card"><div class="feature-icon"><i class="fa-solid fa-chart-line" style="color:white"></i></div><div><h4 data-i18n="feat.acomp">Acompanhamento</h4><p data-i18n="feat.acomp.sub">✓ Consulta o status da solicitação</p></div></div>
+    </div>
+  </section>
+
+  <section class="tipos-section" id="tipos">
+    <h2 class="section-title" data-i18n="tipos.titulo">Tipos de Denúncia</h2>
+    <div class="tipos-grid">
+      <div class="tipo-card" onclick="selectTipo('violencia', event)"><div class="tipo-icon">🏠</div><h4 data-i18n="tipo.viol">Violência Doméstica</h4><p data-i18n="tipo.viol.sub">Agressões físicas, psicológicas ou ameaças no ambiente familiar</p></div>
+      <div class="tipo-card" onclick="selectTipo('assedio', event)"><div class="tipo-icon">⚠️</div><h4 data-i18n="tipo.ass">Assédio</h4><p data-i18n="tipo.ass.sub">Condutas abusivas que causam constrangimento ou intimidação</p></div>
+      <div class="tipo-card" onclick="selectTipo('abuso', event)"><div class="tipo-icon">🚨</div><h4 data-i18n="tipo.abu">Abuso</h4><p data-i18n="tipo.abu.sub">Violência contra crianças, adolescentes, idosos ou pessoas vulneráveis</p></div>
+      <div class="tipo-card" onclick="selectTipo('discriminacao', event)"><div class="tipo-icon">⚖️</div><h4 data-i18n="tipo.disc">Discriminação</h4><p data-i18n="tipo.disc.sub">Casos de preconceito ou tratamento desigual contra pessoa ou grupo</p></div>
+      <div class="tipo-card" onclick="selectTipo('outros', event)"><div class="tipo-icon">📋</div><h4 data-i18n="tipo.out">Outras Ocorrências</h4><p data-i18n="tipo.out.sub">Qualquer situação que represente risco ou violação de direitos</p></div>
+    </div>
+  </section>
+
+  <section class="how-section" id="como">
+    <h2 class="section-title" data-i18n="como.titulo">Como Funciona</h2>
+    <div class="steps-container">
+      <div class="step step-1">
+        <div class="step-inner">
+          <div class="step-number">1</div>
+          <h4 data-i18n="como.1.titulo">Faça o Registro</h4>
+          <p data-i18n="como.1.sub">Preencha o formulário com as informações disponíveis</p>
+        </div>
+        <div class="step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="step step-2">
+        <div class="step-inner">
+          <div class="step-number">2</div>
+          <h4 data-i18n="como.2.titulo">Envio Seguro</h4>
+          <p data-i18n="como.2.sub">A denúncia é registrada de forma protegida no sistema</p>
+        </div>
+        <div class="step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <div class="step step-3">
+        <div class="step-inner">
+          <div class="step-number">3</div>
+          <h4 data-i18n="como.3.titulo">Encaminhamento</h4>
+          <p data-i18n="como.3.sub">Os dados são analisados e direcionados aos órgãos responsáveis</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section" id="formulario">
+    <h2 class="section-title"><span data-i18n="form.titulo">Fazer Denúncia</span></h2>
+    <div class="form-container">
+      <div class="form-row">
+        <div class="form-group">
+          <label data-i18n="form.tipo_label">Tipo de Denúncia *</label>
+          <select id="f-tipo">
+            <option value="" data-i18n="form.select_ph">Selecione...</option>
+            <option value="violencia" data-i18n="tipo.viol">Violência Doméstica</option>
+            <option value="assedio" data-i18n="tipo.ass">Assédio</option>
+            <option value="abuso" data-i18n="tipo.abu">Abuso</option>
+            <option value="discriminacao" data-i18n="tipo.disc">Discriminação</option>
+            <option value="outros" data-i18n="tipo.out">Outros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-i18n="form.estado">Estado do Local</label>
+          <select id="f-estado"><option value="">Carregando estados...</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label data-i18n="form.cidade">Cidade do Local</label>
+          <select id="f-cidade"><option value="">Selecione o estado primeiro</option></select>
+        </div>
+        <div class="form-group">
+          <label data-i18n="form.endereco">Endereço do Local</label>
+          <input type="text" id="f-endereco" data-i18n-prop="placeholder" data-i18n="form.endereco_ph" placeholder="Rua, número, bairro">
+        </div>
+      </div>
+      <!-- GEOLOCALIZAÇÃO -->
+      <div style="margin-bottom:16px;">
+        <button type="button" id="btn-geolocalizacao" onclick="usarGeolocalizacao()"
+          style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#f0f7ff;color:#1A4DA0;border:1.5px solid #1A4DA0;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;"
+          onmouseover="this.style.background='#1A4DA0';this.style.color='white'"
+          onmouseout="this.style.background='#f0f7ff';this.style.color='#1A4DA0'">
+          <i class="fa-solid fa-location-dot"></i> Usar minha localização
+        </button>
+        <p style="font-size:11px;color:#94a3b8;margin-top:6px;" data-i18n="form.geo_sub">Preenche estado, cidade e endereço automaticamente via GPS</p>
+      </div>
+      <div class="form-group">
+        <label data-i18n="form.data">Data da Ocorrência</label>
+        <input type="date" id="f-data">
+      </div>
+      <div class="form-group">
+        <label data-i18n="form.desc_label">Descreva o ocorrido com o máximo de informação possível *</label>
+        <textarea id="f-descricao" data-i18n-prop="placeholder" data-i18n="form.desc.ph" placeholder="Descreva data/local/horário/pessoas envolvidas/etc. Quanto mais detalhes, melhor..."></textarea>
+      </div>
+      <label class="form-anon" onclick="toggleAnon()">
+        <input type="checkbox" id="f-anonimo">
+        <div>
+          <strong data-i18n="form.anon_title">Denúncia Anônima</strong>
+          <div style="font-size:12px;color:var(--gray-500)" data-i18n="form.anon_sub">Sua identidade não será solicitada nem armazenada</div>
+        </div>
+      </label>
+      <div id="contato-section">
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="form.nome">Nome (opcional)</label><input type="text" id="f-nome" data-i18n-prop="placeholder" data-i18n="form.nome_ph" placeholder="Seu nome"></div>
+          <div class="form-group"><label data-i18n="form.contato">Contato (opcional)</label><input type="text" id="f-contato" data-i18n-prop="placeholder" data-i18n="form.contato_ph" placeholder="E-mail ou telefone"></div>
+        </div>
+      </div>
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this.files)">
+        <div class="upload-icon">📎</div>
+        <p><strong data-i18n="form.upload">Upload de Evidências</strong> <span data-i18n="form.opcional">(opcional)</span></p>
+        <p data-i18n="form.upload.sub">Fotos, documentos, vídeos</p>
+        <div id="file-list" style="margin-top:8px;font-size:12px;color:var(--blue-light)"></div>
+      </div>
+
+      <!-- UPLOAD DE ÁUDIO -->
+      <div style="background:#f8faff;border:1.5px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:16px;">
+        <p style="font-size:14px;font-weight:600;color:#1e293b;margin-bottom:12px;" data-i18n="form.audio">🎙️ Relato em Áudio</p><p style="font-size:11px;font-weight:400;color:#94a3b8;" data-i18n="form.audio_opt">(opcional)</p>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;" data-i18n="form.audio.sub">Prefere falar? Grave um áudio descrevendo o ocorrido.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button type="button" id="btn-gravar" onclick="toggleGravacao()"
+            style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#1A4DA0;color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+            <i class="fa-solid fa-microphone"></i> Gravar relato em áudio
+          </button>
+          <button type="button" onclick="descartarAudio()"
+            style="padding:10px 16px;background:#fee2e2;color:#dc2626;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+            🗑️ Descartar
+          </button>
+        </div>
+        <p id="audio-status" style="font-size:12px;color:#dc2626;margin-top:10px;font-weight:500;"></p>
+        <audio id="audio-player" controls style="display:none;width:100%;margin-top:10px;border-radius:8px;"></audio>
+      </div>
+      <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="enviarDenuncia()" data-i18n="form.enviar">📤 Enviar Denúncia</button>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <h2 class="section-title" data-i18n="faq.titulo">Perguntas Frequentes</h2>
+    <div class="faq-container">
+      <div class="faq-item"><div class="faq-question"><span class="faq-icon">🔒</span><span data-i18n="faq.q1">Minhas informações são protegidas?</span><span class="faq-chevron">▼</span></div><div class="faq-answer" data-i18n="faq.a1">Sim. O sistema Protege+ foi desenvolvido para garantir a segurança das informações enviadas. Seus dados são armazenados de forma segura e utilizados apenas para o encaminhamento da denúncia aos órgãos responsáveis.</div></div>
+      <div class="faq-item"><div class="faq-question"><span class="faq-icon">👤</span><span data-i18n="faq.q2">Posso fazer uma denúncia anônima?</span><span class="faq-chevron">▼</span></div><div class="faq-answer" data-i18n="faq.a2">Sim. O Protege+ permite o envio de denúncias anônimas. Nesse caso, nenhuma informação pessoal será solicitada ou armazenada.</div></div>
+      <div class="faq-item"><div class="faq-question"><span class="faq-icon">📨</span><span data-i18n="faq.q3">Quem recebe a denúncia enviada?</span><span class="faq-chevron">▼</span></div><div class="faq-answer" data-i18n="faq.a3">As denúncias são registradas no sistema e encaminhadas para análise da equipe responsável ou dos órgãos competentes, de acordo com o tipo de ocorrência informada.</div></div>
+      <div class="faq-item"><div class="faq-question"><span class="faq-icon">❓</span><span data-i18n="faq.q4">O que devo fazer depois de enviar a denúncia?</span><span class="faq-chevron">▼</span></div><div class="faq-answer" data-i18n="faq.a4">Após o envio, o sistema irá gerar um número de protocolo. Guarde esse número para acompanhar o status da denúncia na área de consulta do site.</div></div>
+      <div class="faq-item"><div class="faq-question"><span class="faq-icon">⏱</span><span data-i18n="faq.q5">Quanto tempo demora para analisar uma denúncia?</span><span class="faq-chevron">▼</span></div><div class="faq-answer" data-i18n="faq.a5">O tempo de análise pode variar dependendo da complexidade da denúncia e da demanda do sistema. Após o envio, você poderá acompanhar o andamento utilizando o número de protocolo gerado.</div></div>
+    </div>
+  </section>
+
+  <section class="emergency-section">
+    <h2 class="section-title" data-i18n="emer.titulo">Canais de emergência</h2>
+    <div class="emergency-grid">
+      <div class="emergency-card" style="background:var(--blue-main)"><div class="emerg-number">190</div><div class="emerg-name" data-i18n="emer.pol">Polícia Militar</div><div class="emerg-desc" data-i18n="emer.pol.sub">Para emergências e situações de risco imediato</div></div>
+      <div class="emergency-card" style="background:#D97706"><div class="emerg-number">193</div><div class="emerg-name" data-i18n="emer.bom">Corpo de Bombeiros</div><div class="emerg-desc" data-i18n="emer.bom.sub">Para incêndios, resgates e acidentes</div></div>
+      <div class="emergency-card" style="background:var(--red)"><div class="emerg-number">180</div><div class="emerg-name" data-i18n="emer.mul">Atendimento à Mulher</div><div class="emerg-desc" data-i18n="emer.mul.sub">Denúncias de violência contra a mulher</div></div>
+      <div class="emergency-card" style="background:var(--purple)"><div class="emerg-number">100</div><div class="emerg-name" data-i18n="emer.dh">Disque Direitos Humanos</div><div class="emerg-desc" data-i18n="emer.dh.sub">Para denúncias de violações de direitos humanos</div></div>
+      <div class="emergency-card" style="background:var(--green)"><div class="emerg-number">192</div><div class="emerg-name" data-i18n="emer.samu">SAMU</div><div class="emerg-desc" data-i18n="emer.samu.sub">Atendimento médico de urgência</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="navbar-brand">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" onclick="navigate('politica')" data-i18n="footer.priv">Política de Privacidade</a>
+      <a class="footer-link" onclick="navigate('etica')" data-i18n="footer.dir">Diretrizes e Uso Ético</a>
+    </div>
+    <div class="footer-copy">© 2026 Protege+ – <span data-i18n="footer.copy">Projeto acadêmico de inovação em GovTech. Todos os direitos reservados.</span></div>
+  </footer>
+</div>
+
+<!-- ===== MODAL PROTOCOLO ===== -->
+<div class="modal-overlay" id="modal-protocolo">
+  <div class="modal">
+    <div class="modal-success-icon">✅</div>
+    <h2>Denúncia Enviada!</h2>
+    <p>Sua denúncia foi registrada com sucesso. Guarde o número de protocolo abaixo para acompanhar o status.</p>
+    <div class="protocol-badge">
+      <div class="protocol-label">Número do Protocolo</div>
+      <div class="protocol-number" id="modal-protocol-num">#2026-00001</div>
+    </div>
+    <div id="modal-score-badge" style="margin:12px 0;text-align:center"></div>
+    <!-- QR CODE -->
+    <div id="qrcode-container"></div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+      <button class="btn btn-primary" onclick="acompanharDenuncia()">🔍 Acompanhar</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: STATUS ===== -->
+<div class="page" id="page-status">
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="navigate('landing')">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn btn-primary btn-sm" onclick="navigate('landing')">🏠 Início</button>
+    </div>
+  </nav>
+  <div class="status-page-content">
+    <div class="status-search-box">
+      <h2>Acompanhe sua Denúncia</h2>
+      <p>Insira o número do protocolo gerado no momento do envio da sua denúncia.</p>
+      <div class="status-input-row">
+        <input type="text" id="protocolo-input" placeholder="Ex: #2026-00001" onkeypress="if(event.key==='Enter')buscarProtocolo()">
+        <button class="btn btn-primary" onclick="buscarProtocolo()">🔍 Buscar</button>
+      </div>
+    </div>
+    <div id="status-result"></div>
+  </div>
+  <footer>
+    <div class="navbar-brand">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" onclick="navigate('politica')" data-i18n="footer.priv">Política de Privacidade</a>
+      <a class="footer-link" onclick="navigate('etica')" data-i18n="footer.dir">Diretrizes e Uso Ético</a>
+    </div>
+    <div class="footer-copy">© 2026 Protege+ – Projeto acadêmico. Todos os direitos reservados.</div>
+  </footer>
+</div>
+
+<!-- ===== PAGE: LOGIN ===== -->
+<div class="page" id="page-login">
+  <div class="login-page" style="min-height:100vh;display:flex;flex-direction:column;">
+    <nav class="navbar">
+      <div class="navbar-brand" onclick="navigate('landing')">
+        <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+        <span class="brand-text">PROTEGE<span>+</span></span>
+      </div>
+      <div class="navbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="navigate('landing')">🏠 Início</button>
+      </div>
+    </nav>
+    <div class="login-content">
+      <div class="login-box">
+        <div class="login-logo">
+          <img src="./images/Logo Protege+ Gov.png" alt="Protege+" style="width:64px;height:64px;object-fit:contain;margin:0 auto 12px;display:block;" onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;&quot;>🛡</div>'">
+          <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--blue-dark);text-align:center">PROTEGE<span style="color:var(--yellow)">+</span></div>
+        </div>
+        <h2>Acesso ao Servidor</h2>
+        <p class="login-sub">Área restrita para servidores autorizados</p>
+        <div class="login-error" id="login-error">Usuário ou senha incorretos.</div>
+        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Digite seu usuário" onkeypress="if(event.key==='Enter')fazerLogin()"></div>
+        <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Digite sua senha" onkeypress="if(event.key==='Enter')fazerLogin()"></div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px;background:var(--gray-50);padding:10px;border-radius:6px;">
+          💡 Demo: usuário <strong>admin</strong> / senha <strong>admin123</strong>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="fazerLogin()">Entrar</button>
+      </div>
+    </div>
+    <footer>
+      <div class="navbar-brand">
+        <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+        <span class="brand-text">PROTEGE<span>+</span></span>
+      </div>
+      <div class="footer-copy">© 2026 Protege+ – Projeto acadêmico. Todos os direitos reservados.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ===== PAGE: DASHBOARD ===== -->
+<div class="page" id="page-dashboard">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="navbar-actions">
+      <button id="btn-idioma" onclick="I18n.alternar()"
+        title="Mudar idioma"
+        style="width:36px;height:26px;border:2px solid var(--gray-200);border-radius:6px;cursor:pointer;background:transparent;padding:0;overflow:hidden;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:18px;"
+        onmouseover="this.style.borderColor='var(--blue-dark)';this.style.transform='scale(1.1)'"
+        onmouseout="this.style.borderColor='var(--gray-200)';this.style.transform='scale(1)'">
+        🇧🇷
+      </button>
+      <button class="btn btn-ghost btn-sm btn-dark-toggle" onclick="toggleDarkMode()" title="Modo Escuro"><i class="fa-solid fa-moon"></i></button>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('landing')">🏠</button>
+      <button class="btn btn-danger btn-sm" onclick="fazerLogout()">Sair</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <div class="sidebar-user">
+        <div class="user-avatar">👤</div>
+        <div class="user-info">
+          <div class="user-name">Admin Silva</div>
+          <div class="user-role">Analista • SP</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-item active" onclick="showDashTab('resumo', this)">
+          <span class="item-icon">📊</span> Resumo
+        </div>
+        <div class="sidebar-item" onclick="showDashTab('backlog', this)">
+          <span class="item-icon">📋</span> Backlog Denúncias
+        </div>
+        <div class="sidebar-item" onclick="showDashTab('status-d', this)">
+          <span class="item-icon">⚙️</span> Status das Denúncias
+        </div>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <!-- TAB RESUMO — visível por padrão -->
+      <div class="dashboard-content" id="tab-resumo">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Total de Denúncias</div>
+            <div class="kpi-value" id="kpi-total">—</div>
+            <div class="kpi-icon">📋</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Prioritárias</div>
+            <div class="kpi-value" id="kpi-prior">—</div>
+            <div class="kpi-icon">⚠️</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Em Andamento</div>
+            <div class="kpi-value" id="kpi-and">—</div>
+            <div class="kpi-icon">⏳</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Tempo Médio (Resposta)</div>
+            <div class="kpi-value" style="font-size:22px" id="kpi-tempo">3h 25min</div>
+            <div class="kpi-icon">🕐</div>
+          </div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card"><h3>Total de Denúncias por Tipo</h3><div class="chart-canvas-container"><canvas id="chart-tipos"></canvas></div></div>
+          <div class="chart-card" id="chart-estados-card"><div id="chart-estados"></div></div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card"><h3>Evolução Mensal</h3><div class="chart-canvas-container"><canvas id="chart-mensal"></canvas></div></div>
+          <div class="chart-card"><h3>Distribuição por Status</h3><div class="chart-canvas-container"><canvas id="chart-status"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- TAB BACKLOG — com filtros avançados -->
+      <div class="dashboard-content" id="tab-backlog" style="display:none">
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Backlog de Denúncias</h3>
+          </div>
+
+          <!-- FILTROS AVANÇADOS -->
+          <div style="background:#f8faff;border:1.5px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:16px;">
+            <p style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:12px;">🔍 Filtros Avançados</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">
+              <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;">Tipo</label>
+                <select id="filtro-tipo" style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;margin-top:4px;">
+                  <option value="all">Todos os tipos</option>
+                  <option value="violencia">Violência Dom.</option>
+                  <option value="assedio" data-i18n="tipo.ass">Assédio</option>
+                  <option value="abuso" data-i18n="tipo.abu">Abuso</option>
+                  <option value="discriminacao" data-i18n="tipo.disc">Discriminação</option>
+                  <option value="outros" data-i18n="tipo.out">Outros</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;">Status</label>
+                <select id="filtro-status" style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;margin-top:4px;">
+                  <option value="all">Todos os status</option>
+                  <option value="recebida">Recebida</option>
+                  <option value="analise">Em Análise</option>
+                  <option value="encaminhada">Encaminhada</option>
+                  <option value="concluida">Concluída</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;">Score</label>
+                <select id="filtro-score" style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;margin-top:4px;">
+                  <option value="all">Qualquer score</option>
+                  <option value="high">Alta confiabilidade</option>
+                  <option value="medium">Média confiabilidade</option>
+                  <option value="low">Baixa confiabilidade</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;">Estado (UF)</label>
+                <select id="filtro-uf" style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;margin-top:4px;">
+                  <option value="">Todos os estados</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;">Data início</label>
+                <input type="date" id="filtro-data1" style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;margin-top:4px;">
+              </div>
+              <div>
+                <label style="font-size:11px;color:#64748b;font-weight:600;">Data fim</label>
+                <input type="date" id="filtro-data2" style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;margin-top:4px;">
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:center;">
+              <button onclick="aplicarFiltrosAvancados()"
+                style="padding:9px 20px;background:#1A4DA0;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+                🔍 Aplicar Filtros
+              </button>
+              <button onclick="limparFiltros()"
+                style="padding:9px 16px;background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+                ✕ Limpar
+              </button>
+              <span id="backlog-contador" style="font-size:12px;color:#64748b;margin-left:auto;"></span>
+            </div>
+          </div>
+
+          <table id="backlog-table">
+            <thead>
+              <tr>
+                <th>Protocolo</th><th>Tipo</th><th>Local</th><th>Data</th>
+                <th>Status</th><th>Score</th><th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="backlog-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB STATUS DENÚNCIAS -->
+      <div class="dashboard-content" id="tab-status-d" style="display:none">
+        <div class="table-card">
+          <div class="table-header"><h3>Atualizar Status das Denúncias</h3></div>
+          <table>
+            <thead>
+              <tr><th>Protocolo</th><th>Tipo</th><th>Status Atual</th><th>Novo Status</th><th>Salvar</th></tr>
+            </thead>
+            <tbody id="status-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer>
+    <div class="navbar-brand">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="footer-copy">© 2026 Protege+ – Projeto acadêmico. Todos os direitos reservados.</div>
+  </footer>
+</div>
+
+<!-- ===== PAGE: POLÍTICA ===== -->
+<div class="page" id="page-politica">
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="navigate('landing')">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="navbar-actions"><button class="btn btn-primary btn-sm" onclick="navigate('landing')">← Voltar</button></div>
+  </nav>
+  <div class="policy-content">
+    <h1>Política de Privacidade e Proteção de Dados</h1>
+    <p class="policy-intro">O <strong>Protege+</strong> é uma plataforma digital desenvolvida com finalidade acadêmica no contexto de inovação em GovTech. Esta Política descreve como as informações são tratadas dentro do sistema, em conformidade com os princípios da LGPD – Lei nº 13.709/2018.</p>
+    <div class="policy-card">
+      <div class="policy-section"><h2>1. Finalidade do tratamento de dados</h2><p>As informações fornecidas pelo usuário são utilizadas exclusivamente para simulação de registro, organização, análise e acompanhamento de denúncias dentro da plataforma.</p></div>
+      <div class="policy-section"><h2>2. Coleta de informações</h2><p>O sistema coleta apenas os dados inseridos voluntariamente pelo usuário, podendo incluir:</p><ul><li>Descrição da denúncia</li><li>Informações contextuais</li><li>Arquivos anexados (opcional)</li></ul></div>
+      <div class="policy-section"><h2>3. Denúncia anônima</h2><p>O Protege+ permite o envio de denúncias de forma totalmente anônima, sem a exigência de qualquer dado pessoal identificável.</p></div>
+      <div class="policy-section"><h2>4. Armazenamento de dados</h2><p>As informações são armazenadas localmente no navegador do usuário (LocalStorage), sem transmissão para servidores externos.</p></div>
+      <div class="policy-section"><h2>5. Transparência e limitações</h2><p>O Protege+ não realiza integração com órgãos públicos. Seu uso é exclusivamente educacional e demonstrativo.</p></div>
+      <div class="policy-section"><h2>6. Direitos do titular (LGPD)</h2><p>Em um ambiente real, o titular dos dados teria direito a acesso, correção, exclusão de dados pessoais e revogação de consentimento.</p></div>
+      <div class="policy-date">Última atualização: Abril de 2026</div>
+    </div>
+  </div>
+  <footer>
+    <div class="navbar-brand"><div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div><span class="brand-text">PROTEGE<span>+</span></span></div>
+    <div class="footer-copy">© 2026 Protege+ – Projeto acadêmico. Todos os direitos reservados.</div>
+  </footer>
+</div>
+
+<!-- ===== PAGE: ÉTICA ===== -->
+<div class="page" id="page-etica">
+  <nav class="navbar">
+    <div class="navbar-brand" onclick="navigate('landing')">
+      <div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div>
+      <span class="brand-text">PROTEGE<span>+</span></span>
+    </div>
+    <div class="navbar-actions"><button class="btn btn-primary btn-sm" onclick="navigate('landing')">← Voltar</button></div>
+  </nav>
+  <div class="policy-content">
+    <h1>Diretrizes de Uso Ético e Responsável</h1>
+    <p class="policy-intro">O <strong>Protege+</strong> foi concebido como uma ferramenta de conscientização social e exercício de cidadania digital, incentivando o uso responsável da tecnologia no contexto de denúncias.</p>
+    <div class="policy-card">
+      <div class="policy-section"><h2>1. Compromisso com a veracidade</h2><p>As informações fornecidas devem refletir situações reais ou plausíveis, evitando conteúdos falsos, manipulados ou enganosos.</p></div>
+      <div class="policy-section"><h2>2. Proibição de uso indevido</h2><p>É vedado utilizar o sistema para acusar indevidamente terceiros, disseminar informações falsas ou produzir conteúdo ofensivo ou discriminatório.</p></div>
+      <div class="policy-section"><h2>3. Impacto das denúncias falsas</h2><p>Denúncias infundadas podem gerar prejuízos sociais e comprometer a credibilidade de sistemas legítimos.</p></div>
+      <div class="policy-section"><h2>4. Uso educacional</h2><p>A plataforma tem caráter exclusivamente acadêmico, sendo destinada à demonstração de conceitos de tecnologia e governança digital.</p></div>
+      <div class="policy-section"><h2>5. Incentivo à cidadania digital</h2><p>O uso adequado do sistema contribui para o desenvolvimento de uma cultura de responsabilidade e participação consciente na sociedade.</p></div>
+      <div class="policy-section"><h2>6. Consequências do uso inadequado</h2><p>O uso indevido pode resultar na invalidação das informações registradas dentro do sistema.</p></div>
+      <div class="policy-date">Última atualização: Abril de 2026</div>
+    </div>
+  </div>
+  <footer>
+    <div class="navbar-brand"><div class="brand-logo"><img src="./images/Logo Protege+ Gov.png" alt="Protege+" onerror="this.style.display='none';this.parentNode.innerHTML='🛡'"></div><span class="brand-text">PROTEGE<span>+</span></span></div>
+    <div class="footer-copy">© 2026 Protege+ – Projeto acadêmico. Todos os direitos reservados.</div>
+  </footer>
+</div>
+
+<!-- ===== CHATBOT ===== -->
+<button class="chatbot-btn" id="chatbot-btn" title="VigIA - Assistente Virtual">
+  🤖
+  <span class="chatbot-badge">1</span>
+</button>
+
+<div class="chatbot-window" id="chatbot-window">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar">🛡</div>
+    <div class="chatbot-info">
+      <div class="bot-name">VigIA</div>
+      <div class="bot-status"><span class="bot-online-dot"></span> Online — Assistente Protege+</div>
+    </div>
+    <div class="chatbot-header-actions">
+      <button class="chatbot-close" id="chat-menu-btn" title="Menu principal">☰</button>
+      <button class="chatbot-close" id="chat-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="chatbot-messages" id="chatbot-messages"></div>
+  <div class="chatbot-input">
+    <input type="text" id="chat-input" placeholder="Digite sua mensagem ou número...">
+    <button class="chatbot-send">➤</button>
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="./js/score.js"></script>
+<script src="./js/api.js"></script>
+<script src="./js/faq.js"></script>
+<script src="./js/i18n.js"></script>
+<script src="./js/safe-mode.js"></script>
+<script src="./js/chatbot.js"></script>
+<script src="./js/main.js"></script>
+
+<script>
+// ── Menu mobile ──────────────────────────────────────────
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('hamburger-btn');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu')?.classList.remove('open');
+  document.getElementById('hamburger-btn')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('click', e => {
+  const menu = document.getElementById('mobile-menu');
+  const btn  = document.getElementById('hamburger-btn');
+  if (menu?.classList.contains('open') && !menu.contains(e.target) && !btn?.contains(e.target)) {
+    closeMobileMenu();
+  }
+});
+</script>
+
+</body>
+</html>

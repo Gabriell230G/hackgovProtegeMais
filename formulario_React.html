@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protege+ | Formulário React</title>
+
+  <!-- React via CDN — sem necessidade de build/npm -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel para transformar JSX no browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Reset e Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark:  #1B5E20;
+      --green-main:  #2E7D32;
+      --green-light: #4CAF50;
+      --blue-dark:   #1A4DA0;
+      --blue-light:  #2563EB;
+      --yellow:      #F9A825;
+      --red:         #DC2626;
+      --gray-50:     #F8FAFC;
+      --gray-100:    #F1F5F9;
+      --gray-200:    #E2E8F0;
+      --gray-400:    #94A3B8;
+      --gray-500:    #64748B;
+      --gray-700:    #334155;
+      --gray-900:    #0F172A;
+      --radius:      10px;
+      --shadow:      0 4px 20px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f0f4ff;
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: var(--gray-900);
+    }
+
+    /* ── Navbar mínima ── */
+    .navbar {
+      background: var(--green-dark);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+    .navbar-brand {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    .navbar-brand span { color: var(--yellow); }
+    .navbar-badge {
+      background: rgba(255,255,255,.15);
+      color: white;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.3);
+    }
+    .back-link {
+      color: rgba(255,255,255,.8);
+      font-size: 13px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s;
+    }
+    .back-link:hover { color: white; }
+
+    /* ── Container ── */
+    .page-wrapper {
+      max-width: 720px;
+      margin: 100px auto 0;
+      padding: 0 0 60px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .page-header h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      color: var(--gray-500);
+      font-size: 14px;
+    }
+    .react-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Form card ── */
+    .form-card {
+      background: white;
+      border-radius: 16px;
+      padding: 36px 40px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gray-200);
+    }
+
+    .form-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--gray-100);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 540px) { .form-row { grid-template-columns: 1fr; } }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    label .req { color: var(--red); margin-left: 2px; }
+
+    input, select, textarea {
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--gray-900);
+      background: white;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+    input.error, select.error, textarea.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(220,38,38,.1);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+
+    .error-msg {
+      font-size: 12px;
+      color: var(--red);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    /* ── Anônimo toggle ── */
+    .anon-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: border-color .2s, background .2s;
+    }
+    .anon-toggle:hover { border-color: var(--blue-light); background: #f0f7ff; }
+    .anon-toggle.active { border-color: var(--green-light); background: #f0fff4; }
+    .anon-toggle input { display: none; }
+    .anon-toggle-box {
+      width: 20px; height: 20px;
+      border: 2px solid var(--gray-400);
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+    .anon-toggle.active .anon-toggle-box {
+      background: var(--green-light);
+      border-color: var(--green-light);
+    }
+
+    /* ── Score preview ── */
+    .score-preview {
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .score-bar-wrap {
+      flex: 1;
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .score-bar {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .4s ease, background .4s ease;
+    }
+    .score-label {
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* ── Estados de integração ── */
+    .state-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .state-banner.loading  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .state-banner.success  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .state-banner.error    { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Botão enviar ── */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--green-dark);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background .2s, transform .1s;
+    }
+    .btn-submit:hover:not(:disabled) { background: var(--green-main); transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* ── Modal protocolo ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 20px;
+    }
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+      animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(.85); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .modal-icon { font-size: 56px; margin-bottom: 12px; }
+    .modal h2 { font-family: 'Sora', sans-serif; color: var(--green-dark); margin-bottom: 8px; }
+    .modal-protocol {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue-dark);
+      background: var(--gray-50);
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius);
+      padding: 12px 24px;
+      margin: 16px 0;
+      letter-spacing: 1px;
+    }
+    .modal-close {
+      padding: 12px 32px;
+      background: var(--green-dark);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* ── Nota técnica ── */
+    .tech-note {
+      background: #f8faff;
+      border: 1.5px solid #dbeafe;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--gray-500);
+      line-height: 1.7;
+    }
+    .tech-note strong { color: var(--blue-dark); }
+    .tech-note code {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div class="navbar-brand">PROTEGE<span>+</span></div>
+      <span class="navbar-badge">React Component</span>
+    </div>
+    <a href="index.html" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Voltar ao sistema
+    </a>
+  </nav>
+
+  <!-- Root do React -->
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+
+    // ══════════════════════════════════════════════════════════
+    // API Client — simula integração com backend Spring Boot
+    // ══════════════════════════════════════════════════════════
+    const ApiClient = {
+      BASE_URL: 'https://api.protege.gov.br/v1', // endpoint real futuro
+
+      // Simula latência de rede (200–600ms)
+      _delay: (ms) => new Promise(r => setTimeout(r, ms)),
+
+      async getEstados() {
+        // Integração real com IBGE
+        const res = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome');
+        if (!res.ok) throw new Error('Falha ao carregar estados');
+        return res.json();
+      },
+
+      async getCidades(uf) {
+        const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios?orderBy=nome`);
+        if (!res.ok) throw new Error('Falha ao carregar cidades');
+        return res.json();
+      },
+
+      async enviarDenuncia(dados) {
+        // Simula POST /v1/denuncias com latência realista
+        await this._delay(1200);
+
+        // Simula falha ocasional (10% de chance) para demonstrar tratamento de erro
+        if (Math.random() < 0.1) {
+          throw new Error('Serviço temporariamente indisponível. Tente novamente.');
+        }
+
+        // Contrato de resposta do Spring Boot
+        return {
+          success: true,
+          data: {
+            protocolo: '#2026-0' + String(Date.now()).slice(-4),
+            status: 'RECEBIDA',
+            score: calcularScore(dados),
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+    };
+
+    // ══════════════════════════════════════════════════════════
+    // Score — mesmo algoritmo do score.js
+    // ══════════════════════════════════════════════════════════
+    function calcularScore(dados) {
+      let score = 0;
+      if (dados.tipo && dados.descricao?.trim()) score += 20;
+      if (dados.estado) score += 5;
+      if (dados.cidade) score += 5;
+      if (dados.endereco?.trim()) score += 10;
+      if (dados.data) score += 10;
+      const len = dados.descricao?.trim().length || 0;
+      if (len > 0   && len <= 200) score += 10;
+      if (len > 200 && len <= 500) score += 20;
+      if (len > 500)               score += 30;
+      if (dados.anonimo === false && (dados.nome?.trim() || dados.contato?.trim())) score += 10;
+      return Math.min(score, 100);
+    }
+
+    function scoreInfo(score) {
+      if (score <= 30) return { label: 'Baixa confiabilidade', color: '#DC2626', bg: '#FEF2F2' };
+      if (score <= 70) return { label: 'Média confiabilidade', color: '#D97706', bg: '#FFFBEB' };
+      return { label: 'Alta confiabilidade',  color: '#16A34A', bg: '#F0FDF4' };
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Componentes reutilizáveis
+    // ══════════════════════════════════════════════════════════
+
+    // Campo de formulário com validação
+    function FormField({ label, required, error, children }) {
+      return (
+        <div className="form-group">
+          <label>
+            {label}
+            {required && <span className="req">*</span>}
+          </label>
+          {children}
+          {error && (
+            <span className="error-msg">
+              <i className="fa-solid fa-circle-exclamation" style={{fontSize:11}}></i>
+              {error}
+            </span>
+          )}
+        </div>
+      );
+    }
+
+    // Banner de estado de integração
+    function StateBanner({ state, message }) {
+      if (!state) return null;
+      const icons = {
+        loading: <div className="spinner"></div>,
+        success: <i className="fa-solid fa-circle-check"></i>,
+        error:   <i className="fa-solid fa-circle-xmark"></i>,
+      };
+      return (
+        <div className={`state-banner ${state}`}>
+          {icons[state]}
+          <span>{message}</span>
+        </div>
+      );
+    }
+
+    // Barra de score em tempo real
+    function ScoreBar({ score }) {
+      const info = scoreInfo(score);
+      return (
+        <div className="score-preview">
+          <span style={{fontSize:12, color:'#64748b', fontWeight:600, whiteSpace:'nowrap'}}>
+            Score: <strong style={{color:info.color}}>{score}pts</strong>
+          </span>
+          <div className="score-bar-wrap">
+            <div className="score-bar" style={{width:`${score}%`, background:info.color}}></div>
+          </div>
+          <span className="score-label" style={{color:info.color}}>{info.label}</span>
+        </div>
+      );
+    }
+
+    // Modal de protocolo gerado
+    function ModalProtocolo({ protocolo, score, onClose }) {
+      const info = scoreInfo(score);
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-icon">✅</div>
+            <h2>Denúncia Registrada!</h2>
+            <p style={{color:'#64748b', fontSize:14, marginBottom:8}}>
+              Seu número de protocolo é:
+            </p>
+            <div className="modal-protocol">{protocolo}</div>
+            <div style={{
+              display:'inline-block',
+              padding:'6px 16px',
+              borderRadius:20,
+              background: info.bg,
+              color: info.color,
+              fontSize:13,
+              fontWeight:700,
+              marginBottom:8
+            }}>
+              {score}pts — {info.label}
+            </div>
+            <p style={{fontSize:12, color:'#94a3b8', marginBottom:16}}>
+              Guarde este número para acompanhar o status da sua denúncia.
+            </p>
+            <button className="modal-close" onClick={onClose}>
+              Fechar
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // Componente principal — FormularioDenuncia
+    // ══════════════════════════════════════════════════════════
+    function FormularioDenuncia() {
+      // ── Estado do formulário ──────────────────────────────
+      const [form, setForm] = useState({
+        tipo: '', estado: '', cidade: '', endereco: '',
+        data: new Date().toISOString().split('T')[0],
+        descricao: '', anonimo: true, nome: '', contato: '',
+      });
+      const [erros, setErros] = useState({});
+
+      // ── Estado de integração ──────────────────────────────
+      const [estados,       setEstados]       = useState([]);
+      const [cidades,       setCidades]       = useState([]);
+      const [loadEstados,   setLoadEstados]   = useState({ state: 'loading', msg: 'Carregando estados...' });
+      const [loadCidades,   setLoadCidades]   = useState(null);
+      const [submitState,   setSubmitState]   = useState(null); // null | loading | success | error
+      const [submitMsg,     setSubmitMsg]     = useState('');
+      const [protocolo,     setProtocolo]     = useState(null);
+      const [scoreAtual,    setScoreAtual]    = useState(0);
+
+      // ── Carrega estados ao montar ─────────────────────────
+      useEffect(() => {
+        ApiClient.getEstados()
+          .then(data => {
+            setEstados(data);
+            setLoadEstados({ state: 'success', msg: `${data.length} estados carregados` });
+            setTimeout(() => setLoadEstados(null), 2000);
+          })
+          .catch(err => {
+            setLoadEstados({ state: 'error', msg: 'Falha ao carregar estados. Tente recarregar.' });
+          });
+      }, []);
+
+      // ── Carrega cidades ao mudar estado ──────────────────
+      useEffect(() => {
+        if (!form.estado) { setCidades([]); return; }
+        setLoadCidades({ state: 'loading', msg: `Carregando cidades de ${form.estado}...` });
+        setCidades([]);
+        setForm(f => ({ ...f, cidade: '' }));
+
+        ApiClient.getCidades(form.estado)
+          .then(data => {
+            setCidades(data);
+            setLoadCidades({ state: 'success', msg: `${data.length} cidades carregadas` });
+            setTimeout(() => setLoadCidades(null), 2000);
+          })
+          .catch(() => {
+            setLoadCidades({ state: 'error', msg: 'Falha ao carregar cidades.' });
+          });
+      }, [form.estado]);
+
+      // ── Recalcula score em tempo real ─────────────────────
+      useEffect(() => {
+        setScoreAtual(calcularScore(form));
+      }, [form]);
+
+      // ── Atualiza campo ────────────────────────────────────
+      const set = (campo, valor) => {
+        setForm(f => ({ ...f, [campo]: valor }));
+        if (erros[campo]) setErros(e => ({ ...e, [campo]: '' }));
+      };
+
+      // ── Validação ─────────────────────────────────────────
+      const validar = () => {
+        const e = {};
+        if (!form.tipo)                        e.tipo      = 'Selecione o tipo de denúncia';
+        if (!form.descricao.trim())            e.descricao = 'Descreva o ocorrido';
+        if (form.descricao.trim().length < 20) e.descricao = 'Descrição muito curta (mínimo 20 caracteres)';
+        setErros(e);
+        return Object.keys(e).length === 0;
+      };
+
+      // ── Envio ─────────────────────────────────────────────
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validar()) return;
+
+        setSubmitState('loading');
+        setSubmitMsg('Enviando denúncia com segurança...');
+
+        try {
+          const res = await ApiClient.enviarDenuncia(form);
+          setProtocolo({ numero: res.data.protocolo, score: res.data.score });
+          setSubmitState('success');
+          setSubmitMsg('Denúncia registrada com sucesso!');
+        } catch (err) {
+          setSubmitState('error');
+          setSubmitMsg(err.message || 'Erro ao enviar. Tente novamente.');
+          setTimeout(() => setSubmitState(null), 5000);
+        }
+      };
+
+      const fecharModal = () => {
+        setProtocolo(null);
+        setSubmitState(null);
+        setForm({
+          tipo:'', estado:'', cidade:'', endereco:'',
+          data: new Date().toISOString().split('T')[0],
+          descricao:'', anonimo:true, nome:'', contato:'',
+        });
+        setErros({});
+      };
+
+      // ── Render ────────────────────────────────────────────
+      return (
+        <div className="page-wrapper">
+          <div className="page-header">
+            <div className="react-badge">
+              <i className="fa-brands fa-react" style={{fontSize:13}}></i>
+              Componente React — Fase 4 HackGov
+            </div>
+            <h1>Fazer Denúncia</h1>
+            <p>Canal seguro e sigiloso para registro de ocorrências</p>
+          </div>
+
+          <div className="form-card">
+            <form onSubmit={handleSubmit} noValidate>
+
+              {/* ── Identificação ── */}
+              <div className="form-section-title">Identificação da Ocorrência</div>
+
+              <div className="form-row">
+                <FormField label="Tipo de Denúncia" required error={erros.tipo}>
+                  <select
+                    value={form.tipo}
+                    onChange={e => set('tipo', e.target.value)}
+                    className={erros.tipo ? 'error' : ''}
+                  >
+                    <option value="">Selecione...</option>
+                    <option value="violencia">Violência Doméstica</option>
+                    <option value="assedio">Assédio</option>
+                    <option value="abuso">Abuso</option>
+                    <option value="discriminacao">Discriminação</option>
+                    <option value="outros">Outras Ocorrências</option>
+                  </select>
+                </FormField>
+
+                <FormField label="Data da Ocorrência">
+                  <input
+                    type="date"
+                    value={form.data}
+                    onChange={e => set('data', e.target.value)}
+                  />
+                </FormField>
+              </div>
+
+              {/* ── Localização ── */}
+              <div className="form-section-title" style={{marginTop:8}}>Localização</div>
+
+              <StateBanner
+                state={loadEstados?.state}
+                message={loadEstados?.msg}
+              />
+
+              <div className="form-row">
+                <FormField label="Estado">
+                  <select
+                    value={form.estado}
+                    onChange={e => set('estado', e.target.value)}
+                    disabled={!estados.length}
+                  >
+                    <option value="">Selecione o estado</option>
+                    {estados.map(est => (
+                      <option key={est.id} value={est.sigla}>
+                        {est.sigla} — {est.nome}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+
+                <FormField label="Cidade">
+                  {loadCidades?.state === 'loading'
+                    ? <StateBanner state="loading" message={loadCidades.msg} />
+                    : (
+                      <select
+                        value={form.cidade}
+                        onChange={e => set('cidade', e.target.value)}
+                        disabled={!cidades.length}
+                      >
+                        <option value="">
+                          {form.estado ? 'Selecione a cidade' : 'Selecione o estado primeiro'}
+                        </option>
+                        {cidades.map(c => (
+                          <option key={c.id} value={c.nome}>{c.nome}</option>
+                        ))}
+                      </select>
+                    )
+                  }
+                </FormField>
+              </div>
+
+              <FormField label="Endereço (rua, número, bairro)">
+                <input
+                  type="text"
+                  placeholder="Rua, número, bairro"
+                  value={form.endereco}
+                  onChange={e => set('endereco', e.target.value)}
+                />
+              </FormField>
+
+              {/* ── Descrição ── */}
+              <div className="form-section-title" style={{marginTop:8}}>Relato</div>
+
+              <FormField label="Descreva o ocorrido" required error={erros.descricao}>
+                <textarea
+                  placeholder="Descreva com o máximo de detalhes: data, local, pessoas envolvidas..."
+                  value={form.descricao}
+                  onChange={e => set('descricao', e.target.value)}
+                  className={erros.descricao ? 'error' : ''}
+                  rows={5}
+                />
+              </FormField>
+
+              {/* ── Score em tempo real ── */}
+              <ScoreBar score={scoreAtual} />
+
+              {/* ── Anonimato ── */}
+              <div className="form-section-title">Identificação</div>
+
+              <div
+                className={`anon-toggle ${form.anonimo ? 'active' : ''}`}
+                onClick={() => set('anonimo', !form.anonimo)}
+              >
+                <div className="anon-toggle-box">
+                  {form.anonimo && <i className="fa-solid fa-check" style={{fontSize:11, color:'white'}}></i>}
+                </div>
+                <div>
+                  <div style={{fontWeight:600, fontSize:14}}>Denúncia Anônima</div>
+                  <div style={{fontSize:12, color:'#64748b'}}>
+                    Sua identidade não será solicitada nem armazenada
+                  </div>
+                </div>
+              </div>
+
+              {!form.anonimo && (
+                <div className="form-row">
+                  <FormField label="Nome (opcional)">
+                    <input
+                      type="text"
+                      placeholder="Seu nome"
+                      value={form.nome}
+                      onChange={e => set('nome', e.target.value)}
+                    />
+                  </FormField>
+                  <FormField label="Contato (opcional)">
+                    <input
+                      type="text"
+                      placeholder="E-mail ou telefone"
+                      value={form.contato}
+                      onChange={e => set('contato', e.target.value)}
+                    />
+                  </FormField>
+                </div>
+              )}
+
+              {/* ── Estado de integração do submit ── */}
+              {submitState && submitState !== 'success' && (
+                <StateBanner state={submitState} message={submitMsg} />
+              )}
+
+              {/* ── Botão enviar ── */}
+              <button
+                type="submit"
+                className="btn-submit"
+                disabled={submitState === 'loading'}
+              >
+                {submitState === 'loading'
+                  ? <><div className="spinner" style={{borderColor:'rgba(255,255,255,.4)', borderTopColor:'white'}}></div> Enviando...</>
+                  : <><i className="fa-solid fa-paper-plane"></i> Enviar Denúncia</>
+                }
+              </button>
+
+            </form>
+          </div>
+
+          {/* ── Nota técnica ── */}
+          <div className="tech-note">
+            <strong>Nota técnica — React via CDN (sem build)</strong><br/>
+            Este componente usa <code>React 18</code> + <code>Babel Standalone</code> carregados via CDN, sem necessidade de
+            <code>npm</code>, <code>webpack</code> ou <code>vite</code>. Ideal para demonstração.<br/><br/>
+            <strong>Integração com backend:</strong> O módulo <code>ApiClient</code> simula chamadas REST ao endpoint
+            <code>POST /v1/denuncias</code>. Em produção, substituir pela URL real do Spring Boot.
+            Tratamento explícito de estados: <code>loading</code> → <code>success</code> → <code>error</code> com fallback automático.<br/><br/>
+            <strong>Componentes reutilizáveis:</strong> <code>FormField</code>, <code>StateBanner</code>, <code>ScoreBar</code>, <code>ModalProtocolo</code>
+          </div>
+
+          {/* ── Modal ── */}
+          {protocolo && (
+            <ModalProtocolo
+              protocolo={protocolo.numero}
+              score={protocolo.score}
+              onClose={fecharModal}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // Monta o app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<FormularioDenuncia />);
+  </script>
+</body>
+</html>
