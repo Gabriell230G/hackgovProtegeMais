@@ -1,0 +1,231 @@
+/* ============================================================
+   emergencia.css — Fluxo de Emergência + Mapa do Gestor
+   Estilo clean institucional (alinhado ao Protege+)
+   ============================================================ */
+
+/* ── Botão de emergência no hero ───────────────────────────── */
+.hero-actions .btn-emergencia-hero,
+.hero .btn-emergencia-hero,
+.btn-emergencia-hero {
+  background: #DC2626 !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  animation: pulse-emergencia 2.2s ease-in-out infinite;
+  position: relative;
+  transition: background .2s, transform .2s, box-shadow .2s;
+}
+.hero-actions .btn-emergencia-hero:hover,
+.hero .btn-emergencia-hero:hover,
+.hero .btn:not(.btn-yellow).btn-emergencia-hero:hover,
+.btn-emergencia-hero:hover {
+  background: #991B1B !important;   /* vermelho mais escuro, nunca azul */
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(220, 38, 38, 0.55);
+}
+.btn-emergencia-hero:active { transform: translateY(0); }
+
+@keyframes pulse-emergencia {
+  0%, 100% { box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); }
+  50%      { box-shadow: 0 4px 22px rgba(220, 38, 38, 0.65); }
+}
+
+/* ── Overlay do modal de emergência ────────────────────────── */
+#emergencia-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(3px);
+}
+#emergencia-overlay.active { display: flex; }
+
+.emerg-modal {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: emerg-up .25s ease;
+}
+@keyframes emerg-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.emerg-header {
+  background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+  color: #fff;
+  padding: 20px 22px;
+  border-radius: 18px 18px 0 0;
+  position: relative;
+}
+.emerg-header h2 { font-size: 19px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.emerg-header p  { font-size: 13px; opacity: .92; margin: 0; line-height: 1.5; }
+.emerg-close {
+  position: absolute; top: 14px; right: 16px;
+  background: rgba(255,255,255,.2); border: none; color: #fff;
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  font-size: 16px; line-height: 1; transition: background .2s;
+}
+.emerg-close:hover { background: rgba(255,255,255,.35); }
+
+.emerg-body { padding: 22px; }
+
+/* Aviso de risco de vida — destaque */
+.emerg-aviso {
+  background: #FEF2F2;
+  border: 1.5px solid #FECACA;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.emerg-aviso .ico { font-size: 22px; flex-shrink: 0; }
+.emerg-aviso .txt { font-size: 13px; color: #7F1D1D; line-height: 1.55; }
+.emerg-aviso .txt strong { display: block; margin-bottom: 2px; }
+.emerg-aviso a.call-190 {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 8px; background: #DC2626; color: #fff;
+  padding: 9px 18px; border-radius: 100px; font-weight: 700;
+  font-size: 14px; text-decoration: none; transition: background .2s;
+}
+.emerg-aviso a.call-190:hover { background: #B91C1C; }
+
+/* Passos do fluxo rápido */
+.emerg-step-label {
+  font-size: 12px; font-weight: 700; color: #64748B;
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.emerg-step-label .num {
+  background: #DC2626; color: #fff; width: 20px; height: 20px;
+  border-radius: 50%; display: inline-flex; align-items: center;
+  justify-content: center; font-size: 11px;
+}
+
+.emerg-tipos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; }
+.emerg-tipo-btn {
+  border: 1.5px solid #E2E8F0; background: #fff; border-radius: 10px;
+  padding: 12px 10px; cursor: pointer; font-family: inherit; transition: all .15s;
+  text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.emerg-tipo-btn:hover { border-color: #DC2626; background: #FEF2F2; }
+.emerg-tipo-btn.selected { border-color: #DC2626; background: #DC2626; }
+.emerg-tipo-btn.selected .emerg-tipo-label,
+.emerg-tipo-btn.selected .emerg-tipo-sub { color: #fff; }
+.emerg-tipo-btn .emoji { font-size: 22px; margin-bottom: 2px; }
+.emerg-tipo-btn .emerg-tipo-label { font-size: 13px; font-weight: 700; color: #334155; }
+.emerg-tipo-btn .emerg-tipo-sub { font-size: 10.5px; font-weight: 400; color: #94A3B8; line-height: 1.3; }
+
+.emerg-loc-status {
+  font-size: 13px; color: #475569; margin-bottom: 18px;
+  padding: 12px 14px; background: #F8FAFC; border-radius: 10px;
+  border: 1px solid #E2E8F0; display: flex; align-items: center; gap: 10px;
+}
+.emerg-loc-status.ok   { background: #F0FDF4; border-color: #BBF7D0; color: #166534; }
+.emerg-loc-status.fail { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
+
+.emerg-btn-enviar {
+  width: 100%; background: #DC2626; color: #fff; border: none;
+  padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: background .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.emerg-btn-enviar:hover:not(:disabled) { background: #B91C1C; }
+.emerg-btn-enviar:disabled { background: #FCA5A5; cursor: not-allowed; }
+
+.emerg-completo-link {
+  display: block; text-align: center; margin-top: 14px;
+  font-size: 13px; color: #2563EB; cursor: pointer; text-decoration: none;
+}
+.emerg-completo-link:hover { text-decoration: underline; }
+
+/* Tela de sucesso dentro do modal */
+.emerg-sucesso { text-align: center; padding: 10px 0; }
+.emerg-sucesso .check { font-size: 52px; margin-bottom: 10px; }
+.emerg-sucesso h3 { font-size: 18px; color: #166534; margin-bottom: 6px; }
+.emerg-sucesso .proto {
+  font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
+  color: #0F172A; background: #F1F5F9; padding: 10px; border-radius: 10px;
+  margin: 12px 0; letter-spacing: 1px;
+}
+.emerg-sucesso p { font-size: 13px; color: #475569; line-height: 1.6; }
+
+/* ── Confirmação de mudança de status (gestor) ─────────────── */
+#status-confirm-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15, 23, 42, 0.6); z-index: 9500;
+  align-items: center; justify-content: center; padding: 16px;
+}
+#status-confirm-overlay.active { display: flex; }
+.status-confirm-box {
+  background: #fff; border-radius: 16px; max-width: 400px; width: 100%;
+  padding: 26px; box-shadow: 0 20px 50px rgba(0,0,0,.3); text-align: center;
+}
+.status-confirm-box .ico { font-size: 38px; margin-bottom: 10px; }
+.status-confirm-box h3 { font-size: 18px; color: #0F172A; margin-bottom: 8px; }
+.status-confirm-box p  { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 6px; }
+.status-confirm-box .transicao {
+  font-weight: 700; color: #0F172A; margin: 14px 0;
+  display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px;
+}
+.status-confirm-box .transicao .arrow { color: #94A3B8; }
+.status-confirm-actions { display: flex; gap: 10px; margin-top: 18px; }
+.status-confirm-actions button {
+  flex: 1; padding: 12px; border-radius: 10px; font-weight: 600;
+  font-size: 14px; cursor: pointer; font-family: inherit; border: none;
+}
+.btn-confirm-sim { background: #16A34A; color: #fff; }
+.btn-confirm-sim:hover { background: #15803D; }
+.btn-confirm-nao { background: #F1F5F9; color: #475569; }
+.btn-confirm-nao:hover { background: #E2E8F0; }
+
+/* ── Mapa do gestor ────────────────────────────────────────── */
+.mapa-gestor-wrap {
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 16px;
+  overflow: hidden; margin-top: 20px;
+}
+.mapa-gestor-header {
+  padding: 18px 22px; border-bottom: 1px solid #F1F5F9;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.mapa-gestor-header h3 { font-size: 17px; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 8px; }
+.mapa-gestor-header .sub { font-size: 12px; color: #64748B; margin-top: 2px; }
+.mapa-gestor-controls { display: flex; gap: 10px; align-items: center; }
+.mapa-gestor-controls select {
+  padding: 8px 12px; border: 1.5px solid #E2E8F0; border-radius: 8px;
+  font-family: inherit; font-size: 13px; color: #334155; cursor: pointer;
+}
+#mapa-gestor { height: 480px; width: 100%; background: #F8FAFC; }
+
+.mapa-legenda {
+  padding: 14px 22px; border-top: 1px solid #F1F5F9;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap; font-size: 12px; color: #475569;
+}
+.mapa-legenda .escala { display: flex; align-items: center; gap: 0; }
+.mapa-legenda .escala .cell { width: 26px; height: 14px; }
+.mapa-legenda .escala .cell:first-child { border-radius: 3px 0 0 3px; }
+.mapa-legenda .escala .cell:last-child  { border-radius: 0 3px 3px 0; }
+.mapa-legenda .nota { color: #94A3B8; font-style: italic; }
+
+.mapa-info-popup { font-family: 'DM Sans', sans-serif; }
+.mapa-info-popup h4 { margin: 0 0 6px; font-size: 14px; color: #0F172A; }
+.mapa-info-popup .total { font-size: 22px; font-weight: 700; color: #DC2626; }
+.mapa-info-popup .breakdown { margin-top: 8px; font-size: 12px; color: #475569; line-height: 1.7; }
+.mapa-info-popup .suprimido { font-size: 11px; color: #94A3B8; font-style: italic; margin-top: 6px; }
+
+@media (max-width: 560px) {
+  .emerg-tipos { grid-template-columns: 1fr; }
+  #mapa-gestor { height: 380px; }
+}

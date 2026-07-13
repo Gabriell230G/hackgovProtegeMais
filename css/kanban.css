@@ -1,0 +1,307 @@
+/* ============================================================
+   kanban.css — Kanban de Denúncias + Gestão de Equipe
+   ============================================================ */
+
+/* ── Cabeçalhos ────────────────────────────────────────────── */
+.kanban-header, .equipe-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
+}
+.kanban-header h3, .equipe-header h3 { font-size: 18px; color: #0F172A; margin: 0; }
+.kanban-sub, .equipe-sub { font-size: 13px; color: #64748B; margin-top: 3px; }
+
+/* ── Board ─────────────────────────────────────────────────── */
+.kanban-board {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  align-items: start;
+}
+
+.kanban-col {
+  background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px;
+  min-height: 140px; transition: background .15s, border-color .15s;
+}
+.kanban-col.drag-over { background: #EFF6FF; border-color: #93C5FD; border-style: dashed; }
+
+.kanban-col-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-top: 3px solid; border-radius: 14px 14px 0 0;
+  background: #fff;
+}
+.kc-titulo { font-size: 13px; font-weight: 700; }
+.kc-count {
+  font-size: 12px; font-weight: 700; color: #64748B;
+  background: #F1F5F9; border-radius: 100px; padding: 2px 9px; min-width: 24px; text-align: center;
+}
+
+.kanban-col-body { padding: 10px; display: flex; flex-direction: column; gap: 10px; min-height: 80px; }
+.kanban-vazio { text-align: center; color: #CBD5E1; font-size: 12px; padding: 18px 8px; }
+
+/* ── Card ──────────────────────────────────────────────────── */
+.kanban-card {
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 10px;
+  padding: 12px; cursor: grab; transition: box-shadow .15s, transform .1s;
+  box-shadow: 0 1px 3px rgba(15,23,42,.05);
+}
+.kanban-card:hover { box-shadow: 0 4px 12px rgba(15,23,42,.12); }
+.kanban-card:active { cursor: grabbing; }
+.kanban-card.dragging { opacity: .5; transform: rotate(1.5deg); }
+
+.kc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 6px; }
+.kc-proto { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: #1E293B; }
+.kc-emerg { font-size: 10px; font-weight: 700; color: #DC2626; background: #FEF2F2; border-radius: 100px; padding: 2px 7px; white-space: nowrap; }
+.kc-tipo { font-size: 13px; font-weight: 600; color: #0F172A; margin-bottom: 3px; }
+.kc-local { font-size: 12px; color: #64748B; margin-bottom: 8px; }
+.kc-foot { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.kc-nivel { font-size: 10px; font-weight: 600; background: #F1F5F9; border-radius: 100px; padding: 2px 8px; }
+
+.kc-resp {
+  width: 100%; padding: 6px 8px; border: 1.5px solid #E2E8F0; border-radius: 8px;
+  font-size: 11px; font-family: inherit; color: #334155; cursor: pointer; background: #fff;
+}
+.kc-resp:focus { border-color: #2563EB; outline: none; }
+.kc-atrib { display: flex; flex-direction: column; gap: 6px; }
+.kc-confirm-resp {
+  background: #16A34A; color: #fff; border: none; border-radius: 8px;
+  padding: 6px 10px; font-size: 11px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background .15s; width: 100%;
+}
+.kc-confirm-resp:hover { background: #15803D; }
+.kc-resp-atual { font-size: 11px; color: #16A34A; font-weight: 600; text-align: center; }
+
+/* ── Equipe ────────────────────────────────────────────────── */
+.equipe-wrap {
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 22px;
+}
+.equipe-form {
+  display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 10px;
+  margin-bottom: 20px; align-items: end;
+}
+.equipe-form input {
+  padding: 10px 12px; border: 1.5px solid #E2E8F0; border-radius: 8px;
+  font-size: 13px; font-family: inherit; outline: none;
+}
+.equipe-form input:focus { border-color: #2563EB; }
+
+.equipe-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.equipe-vazio { grid-column: 1/-1; text-align: center; color: #94A3B8; font-size: 13px; padding: 30px; line-height: 1.6; }
+
+.equipe-card {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid #E2E8F0; border-radius: 12px; padding: 12px 14px; background: #FAFBFC;
+}
+.eq-avatar {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
+}
+.eq-info { flex: 1; min-width: 0; }
+.eq-nome { font-size: 14px; font-weight: 600; color: #0F172A; }
+.eq-meta { font-size: 12px; color: #64748B; }
+.eq-remover {
+  background: none; border: none; color: #CBD5E1; cursor: pointer; font-size: 16px;
+  width: 28px; height: 28px; border-radius: 6px; transition: all .15s; flex-shrink: 0;
+}
+.eq-remover:hover { background: #FEF2F2; color: #DC2626; }
+
+@media (max-width: 900px) {
+  .kanban-board { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .kanban-board { grid-template-columns: 1fr; }
+  .equipe-form { grid-template-columns: 1fr; }
+}
+
+/* ── Modo escuro: Kanban + Equipe ── */
+[data-theme="dark"] .kanban-header h3, [data-theme="dark"] .equipe-header h3 { color: #fff; }
+[data-theme="dark"] .kanban-sub, [data-theme="dark"] .equipe-sub { color: #94A3B8; }
+[data-theme="dark"] .kanban-col { background: #0F172A; border-color: #334155; }
+[data-theme="dark"] .kanban-col.drag-over { background: rgba(37,99,235,.12); border-color: #2563EB; }
+[data-theme="dark"] .kanban-col-head { background: #1E293B; }
+[data-theme="dark"] .kc-count { background: #334155; color: #CBD5E1; }
+[data-theme="dark"] .kanban-card { background: #1E293B; border-color: #334155; box-shadow: none; }
+[data-theme="dark"] .kc-proto, [data-theme="dark"] .kc-tipo { color: #F1F5F9; }
+[data-theme="dark"] .kc-local { color: #94A3B8; }
+[data-theme="dark"] .kc-nivel { background: #334155; }
+[data-theme="dark"] .kc-resp { background: #0F172A; border-color: #334155; color: #E2E8F0; }
+[data-theme="dark"] .kc-resp-atual { color: #4ADE80; }
+[data-theme="dark"] .kanban-vazio { color: #475569; }
+[data-theme="dark"] .equipe-wrap { background: #1E293B; border-color: #334155; }
+[data-theme="dark"] .equipe-form input { background: #0F172A; border-color: #334155; color: #E2E8F0; }
+[data-theme="dark"] .equipe-card { background: rgba(255,255,255,.03); border-color: #334155; }
+[data-theme="dark"] .eq-nome { color: #fff; }
+[data-theme="dark"] .eq-meta { color: #94A3B8; }
+[data-theme="dark"] .equipe-vazio { color: #64748B; }
+
+/* ============================================================
+   VigIA — painel de análise inteligente (tema claro/escuro)
+   ============================================================ */
+.vigia-painel {
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px; padding: 20px 22px; margin-bottom: 22px;
+  color: #1E293B;
+  box-shadow: 0 1px 3px rgba(15,23,42,.04);
+}
+.vigia-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #F1F5F9; }
+.vigia-id { display: flex; align-items: center; gap: 12px; }
+.vigia-avatar {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.vigia-id h3 { font-size: 17px; margin: 0; color: #0F172A; display: flex; align-items: center; gap: 8px; }
+.vigia-tag { font-size: 10px; font-weight: 700; background: #EFF6FF; color: #2563EB; padding: 3px 9px; border-radius: 100px; letter-spacing: .3px; }
+.vigia-sub { font-size: 12px; color: #64748B; margin-top: 2px; }
+.vigia-refresh {
+  background: #F1F5F9; color: #334155; border: 1px solid #E2E8F0;
+  border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.vigia-refresh:hover { background: #2563EB; color: #fff; border-color: #2563EB; }
+
+.vigia-secao-tit { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
+
+/* Cards de métrica (leituras) */
+.vigia-metricas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.vigia-metrica {
+  background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 12px;
+  padding: 16px; position: relative; overflow: hidden;
+}
+.vigia-metrica::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--mc, #2563EB);
+}
+.vm-ic { font-size: 20px; margin-bottom: 8px; }
+.vm-valor { font-size: 28px; font-weight: 800; color: var(--mc, #0F172A); line-height: 1; margin-bottom: 6px; }
+.vm-rotulo { font-size: 13px; font-weight: 700; color: #1E293B; line-height: 1.3; }
+.vm-sub { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+
+/* Recomendações em grade 2 colunas */
+.vigia-recs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.vigia-rec {
+  background: #F8FAFC; border: 1px solid #F1F5F9; border-left: 3px solid #94A3B8;
+  border-radius: 10px; padding: 13px 15px;
+}
+.vigia-rec.alta  { border-left-color: #DC2626; background: #FEF2F2; border-color: #FEE2E2; }
+.vigia-rec.media { border-left-color: #D97706; background: #FFFBEB; border-color: #FEF3C7; }
+.vigia-rec.baixa { border-left-color: #2563EB; background: #EFF6FF; border-color: #DBEAFE; }
+.vigia-rec.ok    { border-left-color: #16A34A; background: #F0FDF4; border-color: #DCFCE7; grid-column: 1/-1; }
+.vr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.vr-ic { font-size: 16px; }
+.vr-tit { font-size: 13px; font-weight: 700; color: #0F172A; }
+.vr-porque { font-size: 12px; color: #64748B; line-height: 1.5; }
+.vr-ids { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+.vr-ids span {
+  font-family: 'Space Mono', monospace; font-size: 10px; color: #1D4ED8;
+  background: #EFF6FF; border: 1px solid #DBEAFE; padding: 2px 7px; border-radius: 5px;
+}
+.vr-ids .vr-mais { background: transparent; border: none; color: #94A3B8; font-weight: 700; }
+
+.vigia-carimbo { font-size: 11px; color: #94A3B8; margin-top: 16px; padding-top: 12px; border-top: 1px solid #F1F5F9; text-align: right; }
+
+/* ── Modo escuro: VigIA acompanha o tema ── */
+[data-theme="dark"] .vigia-painel { background: #1E293B; border-color: #334155; color: #E2E8F0; }
+[data-theme="dark"] .vigia-head { border-bottom-color: #334155; }
+[data-theme="dark"] .vigia-id h3 { color: #fff; }
+[data-theme="dark"] .vigia-tag { background: rgba(37,99,235,.2); color: #93C5FD; }
+[data-theme="dark"] .vigia-sub, [data-theme="dark"] .vigia-carimbo { color: #94A3B8; }
+[data-theme="dark"] .vigia-refresh { background: rgba(255,255,255,.08); color: #E2E8F0; border-color: rgba(255,255,255,.15); }
+[data-theme="dark"] .vigia-refresh:hover { background: #2563EB; border-color: #2563EB; }
+[data-theme="dark"] .vigia-secao-tit { color: #64748B; }
+[data-theme="dark"] .vigia-metrica { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.06); }
+[data-theme="dark"] .vm-rotulo { color: #E2E8F0; }
+[data-theme="dark"] .vm-sub { color: #64748B; }
+[data-theme="dark"] .vigia-rec { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.06); }
+[data-theme="dark"] .vigia-rec.alta  { background: rgba(248,113,113,.1);  border-color: rgba(248,113,113,.2); }
+[data-theme="dark"] .vigia-rec.media { background: rgba(251,191,36,.08);  border-color: rgba(251,191,36,.2); }
+[data-theme="dark"] .vigia-rec.baixa { background: rgba(96,165,250,.08);  border-color: rgba(96,165,250,.2); }
+[data-theme="dark"] .vigia-rec.ok    { background: rgba(74,222,128,.08);  border-color: rgba(74,222,128,.2); }
+[data-theme="dark"] .vr-tit { color: #fff; }
+[data-theme="dark"] .vr-porque { color: #94A3B8; }
+[data-theme="dark"] .vr-ids span { background: rgba(56,189,248,.12); border-color: rgba(56,189,248,.2); color: #7DD3FC; }
+[data-theme="dark"] .vigia-carimbo { border-top-color: #334155; }
+
+@media (max-width: 900px) {
+  .vigia-metricas { grid-template-columns: repeat(2, 1fr); }
+  .vigia-recs { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .vigia-metricas { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Barra de filtros do dashboard
+   ============================================================ */
+.dash-filtros {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 12px 16px; margin-bottom: 20px;
+}
+.df-label { font-size: 13px; font-weight: 700; color: #334155; }
+.dash-filtros select {
+  padding: 8px 12px; border: 1.5px solid #E2E8F0; border-radius: 8px;
+  font-size: 13px; font-family: inherit; color: #334155; cursor: pointer; background: #fff;
+}
+.dash-filtros select:focus { border-color: #2563EB; outline: none; }
+.df-limpar {
+  background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; border-radius: 8px;
+  padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.df-limpar:hover { background: #E2E8F0; }
+.df-resultado { font-size: 12px; color: #64748B; margin-left: auto; font-weight: 600; }
+
+[data-theme="dark"] .dash-filtros { background: #1E293B; border-color: #334155; }
+[data-theme="dark"] .df-label { color: #E2E8F0; }
+[data-theme="dark"] .dash-filtros select { background: #0F172A; border-color: #334155; color: #E2E8F0; }
+[data-theme="dark"] .df-limpar { background: rgba(255,255,255,.08); color: #E2E8F0; border-color: rgba(255,255,255,.15); }
+[data-theme="dark"] .df-resultado { color: #94A3B8; }
+
+@media (max-width: 600px) {
+  .dash-filtros { flex-direction: column; align-items: stretch; }
+  .dash-filtros select, .df-limpar { width: 100%; }
+  .df-resultado { margin-left: 0; text-align: center; }
+}
+
+/* ============================================================
+   Controle de acesso por papéis (gestor master)
+   ============================================================ */
+.papel-switch {
+  padding: 14px 16px 16px; border-top: 1px solid rgba(255,255,255,.1); margin-top: 4px;
+}
+.papel-switch-lbl {
+  font-size: 10px; color: rgba(255,255,255,.55); display: block; margin-bottom: 9px;
+  text-transform: uppercase; letter-spacing: .6px; font-weight: 700;
+}
+/* trilho do toggle segmentado */
+.papel-opts {
+  display: flex; gap: 4px; background: rgba(0,0,0,.22);
+  padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08);
+}
+.papel-opt {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 8px 6px; border-radius: 9px; border: none;
+  background: transparent; color: rgba(255,255,255,.7);
+  font-size: 11.5px; font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: all .2s cubic-bezier(.4,0,.2,1); position: relative; white-space: nowrap;
+}
+.papel-opt .po-ic { font-size: 13px; line-height: 1; }
+.papel-opt:hover:not(.active) { color: #fff; background: rgba(255,255,255,.06); }
+
+/* ativo — Master (azul/dourado institucional) */
+.papel-opt.active {
+  color: #1A2B4A; font-weight: 700;
+  background: linear-gradient(135deg, #FBD24D, #F5A623);
+  box-shadow: 0 2px 8px rgba(245,166,35,.4);
+}
+/* quando o Analista está ativo, tom diferente (proteção/olho) */
+#papel-analista.active {
+  color: #fff;
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  box-shadow: 0 2px 8px rgba(37,99,235,.45);
+}
+
+.ident-info { font-size: 11px; color: #16A34A; font-weight: 600; }
+
+/* badge de papel no contexto claro (caso a sidebar seja clara em algum tema) */
+[data-theme="dark"] .papel-switch { border-top-color: rgba(255,255,255,.1); }

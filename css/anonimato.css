@@ -1,0 +1,202 @@
+/* ============================================================
+   anonimato.css — Anonimato Graduado + Elo de Mão Dupla
+   Estilo clean institucional (alinhado ao Protege+)
+   ============================================================ */
+
+/* ── Seleção de nível ──────────────────────────────────────── */
+.anon-niveis { margin: 18px 0; }
+.anon-niveis-titulo { font-size: 15px; font-weight: 700; color: #0F172A; margin-bottom: 3px; }
+.anon-niveis-sub { font-size: 13px; color: #64748B; margin-bottom: 14px; line-height: 1.5; }
+
+.anon-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+.anon-card {
+  position: relative;
+  border: 2px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all .18s;
+  background: #fff;
+}
+.anon-card:hover { border-color: #94A3B8; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15,23,42,.08); }
+.anon-card.selected { border-color: #2563EB; background: #EFF6FF; box-shadow: 0 6px 18px rgba(37,99,235,.18); }
+.anon-card.recomendado { border-color: #BFDBFE; }
+.anon-card.recomendado.selected { border-color: #2563EB; }
+
+.anon-badge-rec {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  background: #2563EB; color: #fff; font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 100px; letter-spacing: .3px; white-space: nowrap;
+}
+.anon-card-head { font-size: 14px; font-weight: 700; color: #1E293B; display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.anon-ic { font-size: 18px; }
+.anon-card-desc { font-size: 12px; color: #475569; line-height: 1.5; margin-bottom: 10px; }
+.anon-card-tradeoff { font-size: 11px; font-weight: 600; line-height: 1.4; padding-top: 8px; border-top: 1px dashed #E2E8F0; }
+.anon-plus  { color: #16A34A; }
+.anon-plus::before  { content: "✓ "; }
+.anon-minus { color: #DC2626; }
+.anon-minus::before { content: "✕ "; }
+
+/* ── Bloco de código na tela de sucesso (modal) ────────────── */
+.cs-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1.5px solid #2563EB; background: #fff; color: #2563EB;
+  border-radius: 100px; padding: 9px 18px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.cs-btn:hover { background: #2563EB; color: #fff; }
+
+/* ── Tela de consulta ──────────────────────────────────────── */
+.consulta-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.consulta-tab {
+  flex: 1; text-align: center; padding: 12px; border-radius: 10px;
+  border: 1.5px solid #E2E8F0; background: #fff; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: #64748B; transition: all .15s;
+}
+.consulta-tab.active { border-color: #2563EB; background: #EFF6FF; color: #1D4ED8; }
+.consulta-tab .ct-ic { margin-right: 5px; }
+
+.consulta-erro {
+  background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626;
+  border-radius: 10px; padding: 14px; font-size: 13px; text-align: center; margin-top: 12px;
+}
+
+.consulta-info-denuncia {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 16px; background: #F8FAFC; border: 1px solid #E2E8F0;
+  border-radius: 12px; margin-top: 16px;
+}
+.cid-protocolo { font-size: 13px; color: #64748B; }
+.cid-protocolo strong { color: #0F172A; font-family: 'Space Mono', monospace; }
+.cid-status-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 100px; }
+.cid-recebida    { background: #EFF6FF; color: #1D4ED8; }
+.cid-analise     { background: #FEF9C3; color: #854D0E; }
+.cid-encaminhada { background: #F3E8FF; color: #6B21A8; }
+.cid-concluida   { background: #DCFCE7; color: #166534; }
+
+.nivel-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 100px; background: #F1F5F9;
+}
+
+/* ── Elo de mensagens (chat) ───────────────────────────────── */
+.elo-chat { border: 1px solid #E2E8F0; border-radius: 14px; overflow: hidden; background: #fff; margin-top: 16px; }
+.elo-chat-head {
+  background: #F8FAFC; padding: 14px 18px; border-bottom: 1px solid #E2E8F0;
+  display: flex; align-items: center; gap: 10px;
+}
+.elo-chat-head .elo-ic { font-size: 20px; }
+.elo-chat-head h4 { font-size: 14px; color: #0F172A; margin: 0; }
+.elo-chat-head .elo-sub { font-size: 11px; color: #64748B; }
+
+.elo-msgs { padding: 18px; max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #FAFBFC; }
+.elo-vazio { text-align: center; color: #94A3B8; font-size: 13px; padding: 30px 16px; line-height: 1.6; }
+
+.elo-msg { max-width: 78%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+.elo-msg .elo-meta { font-size: 10px; opacity: .7; margin-top: 5px; }
+.elo-msg.gestor  { align-self: flex-start; background: #EEF2FF; color: #1E293B; border-bottom-left-radius: 4px; }
+.elo-msg.cidadao { align-self: flex-end;  background: #2563EB; color: #fff;   border-bottom-right-radius: 4px; }
+.elo-msg .elo-autor { font-size: 10px; font-weight: 700; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .3px; opacity: .85; }
+
+.elo-input-row { display: flex; gap: 8px; padding: 14px; border-top: 1px solid #E2E8F0; background: #fff; }
+.elo-input-row input {
+  flex: 1; border: 1.5px solid #E2E8F0; border-radius: 100px; padding: 10px 16px;
+  font-size: 13px; font-family: inherit; outline: none;
+}
+.elo-input-row input:focus { border-color: #2563EB; }
+.elo-input-row button {
+  background: #2563EB; color: #fff; border: none; border-radius: 100px;
+  padding: 10px 20px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 13px;
+}
+.elo-input-row button:hover { background: #1D4ED8; }
+
+/* ── Lado do gestor: badge de nível + pendência na tabela ──── */
+.elo-pendencia {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #FEF2F2; color: #DC2626; font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: 100px; border: 1px solid #FECACA;
+}
+.btn-elo-gestor {
+  background: #EEF2FF; color: #1D4ED8; border: 1px solid #C7D2FE;
+  border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all .15s; position: relative;
+}
+.btn-elo-gestor:hover { background: #1D4ED8; color: #fff; }
+
+/* Modal do elo no gestor */
+#elo-gestor-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(15,23,42,.6);
+  z-index: 9600; align-items: center; justify-content: center; padding: 16px;
+}
+#elo-gestor-overlay.active { display: flex; }
+.elo-gestor-box {
+  background: #fff; border-radius: 16px; width: 100%; max-width: 480px;
+  max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0,0,0,.3);
+}
+.elo-gestor-head {
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%); color: #fff;
+  padding: 18px 22px; position: relative;
+}
+.elo-gestor-head h3 { font-size: 16px; margin: 0 0 3px; }
+.elo-gestor-head .egh-sub { font-size: 12px; opacity: .9; font-family: 'Space Mono', monospace; }
+.elo-gestor-close {
+  position: absolute; top: 14px; right: 16px; background: rgba(255,255,255,.2);
+  border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%;
+  cursor: pointer; font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  .anon-cards { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Reorganização do modal de sucesso (mais compacto e organizado)
+   Sobrepõe o style.css base via especificidade.
+   ============================================================ */
+#modal-protocolo .modal {
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px 28px 24px;
+}
+/* ícone de sucesso menor e com menos margem */
+#modal-protocolo .modal-success-icon {
+  width: 54px; height: 54px; font-size: 24px; margin: 0 auto 12px;
+}
+#modal-protocolo .modal h2 { font-size: 19px; margin-bottom: 5px; }
+#modal-protocolo .modal > p { font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
+
+/* protocolo mais compacto */
+#modal-protocolo .protocol-badge { padding: 12px 18px; margin-bottom: 14px; }
+#modal-protocolo .protocol-badge .protocol-number { font-size: 24px; }
+
+/* bloco do código: menos margem */
+#modal-codigo-bloco { margin: 0 0 14px !important; }
+#modal-codigo-bloco > div { padding: 14px !important; }
+#modal-codigo-valor { font-size: 20px !important; margin-bottom: 8px !important; }
+
+/* score badge compacto */
+#modal-score-badge { margin: 4px 0 14px !important; }
+
+/* QR menor e label discreta */
+#qrcode-container { margin: 4px 0 8px; }
+#qrcode-container img, #qrcode-container canvas {
+  width: 130px !important; height: 130px !important; margin: 0 auto;
+}
+#modal-protocolo .qr-label,
+#modal-protocolo p.qr-hint { font-size: 11px; color: var(--gray-500); margin: 6px 0 0; }
+
+/* botões finais com menos espaço acima */
+#modal-protocolo .modal-actions,
+#modal-protocolo .modal > div:last-child { margin-top: 14px; }
+
+/* divisória sutil entre seções para organizar visualmente */
+#modal-codigo-bloco { border-top: 1px solid var(--gray-100); padding-top: 14px !important; }
+
+@media (max-width: 480px) {
+  #modal-protocolo .modal { padding: 22px 18px; max-height: 92vh; }
+  #modal-codigo-valor { font-size: 17px !important; letter-spacing: 1px; }
+  #modal-protocolo .protocol-badge .protocol-number { font-size: 20px; }
+}

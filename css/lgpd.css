@@ -1,0 +1,79 @@
+/* ============================================================
+   lgpd.css — Painel de Privacidade & Conformidade LGPD
+   ============================================================ */
+
+.lgpd-praticas {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px;
+}
+.lgpd-card {
+  background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 12px; padding: 16px;
+  transition: box-shadow .15s;
+}
+.lgpd-card:hover { box-shadow: 0 4px 14px rgba(15,23,42,.07); }
+.lgpd-ic { font-size: 22px; margin-bottom: 8px; }
+.lgpd-tit { font-size: 14px; font-weight: 700; color: #0F172A; margin-bottom: 5px; }
+.lgpd-txt { font-size: 12px; color: #64748B; line-height: 1.55; }
+
+.lgpd-demo {
+  background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 20px;
+}
+.lgpd-demo-tit { font-size: 14px; font-weight: 700; color: #0F172A; margin-bottom: 16px; }
+.lgpd-demo-grid { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.lgpd-demo-col { flex: 1; min-width: 220px; }
+.ldc-label { font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: .4px; display: block; margin-bottom: 6px; }
+.ldc-box {
+  border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.5;
+  word-break: break-all; min-height: 48px; display: flex; align-items: center;
+}
+.ldc-box.plain { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
+.ldc-box.enc {
+  background: #1E293B; border: 1px solid #334155; color: #7DD3FC;
+  font-family: 'Space Mono', monospace; font-size: 12px;
+}
+.lgpd-demo-arrow { font-size: 22px; color: #CBD5E1; flex-shrink: 0; }
+
+.lgpd-nota {
+  margin-top: 16px; background: #FFFBEB; border: 1px solid #FDE68A;
+  border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #92400E; line-height: 1.6;
+}
+
+/* ── Modo escuro ── */
+[data-theme="dark"] .lgpd-card { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.06); }
+[data-theme="dark"] .lgpd-tit { color: #fff; }
+[data-theme="dark"] .lgpd-txt { color: #94A3B8; }
+[data-theme="dark"] .lgpd-demo { background: #1E293B; border-color: #334155; }
+[data-theme="dark"] .lgpd-demo-tit { color: #fff; }
+[data-theme="dark"] .ldc-box.plain { background: rgba(74,222,128,.1); border-color: rgba(74,222,128,.2); color: #4ADE80; }
+[data-theme="dark"] .lgpd-nota { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.2); color: #FCD34D; }
+
+@media (max-width: 800px) {
+  .lgpd-praticas { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .lgpd-praticas { grid-template-columns: 1fr; }
+  .lgpd-demo-arrow { transform: rotate(90deg); width: 100%; text-align: center; }
+}
+
+/* ============================================================
+   Seção de segurança na LANDING (LGPD público)
+   ============================================================ */
+.seguranca-section {
+  background: linear-gradient(180deg, #F8FAFC 0%, #fff 100%);
+  padding: 60px 40px;
+}
+.seg-header { text-align: center; max-width: 680px; margin: 0 auto 36px; }
+.seg-selo {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #EFF6FF; color: #1D4ED8; font-size: 13px; font-weight: 700;
+  padding: 6px 16px; border-radius: 100px; margin-bottom: 16px;
+}
+.seg-sub { font-size: 16px; color: #64748B; line-height: 1.6; margin-top: 10px; }
+.seguranca-section #lgpd-body { max-width: 1000px; margin: 0 auto; }
+
+[data-theme="dark"] .seguranca-section { background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%); }
+[data-theme="dark"] .seg-selo { background: rgba(37,99,235,.2); color: #93C5FD; }
+[data-theme="dark"] .seg-sub { color: #94A3B8; }
+
+@media (max-width: 640px) {
+  .seguranca-section { padding: 44px 20px; }
+}
