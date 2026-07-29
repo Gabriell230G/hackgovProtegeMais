@@ -146,14 +146,6 @@ Cobrem as regras de score (`ScoreServiceTest`) e a classificação de urgência 
         └── test/java/...     # Testes JUnit
 ```
 
----
-
-## Equipe
-
-<!-- Preencha com os dados do grupo -->
-| Nome | RM | Cidade |
-|---|---|---|
-| … | … | … |
 
 ---
 
