@@ -7,10 +7,19 @@
 // ── Estado global ────────────────────────────────────────────
 // Carrega do localStorage. Se a camada LGPD existir, decifra os campos
 // sensíveis para a memória (que trabalha sempre em texto claro).
-let denuncias = JSON.parse(localStorage.getItem('denuncias') || '[]')
-  .filter(d => d && d.id && d.status && d.tipo)
-  .map(d => (typeof LGPD !== 'undefined' && LGPD.decifrarDenuncia) ? LGPD.decifrarDenuncia(d) : d);
-let protocolCount = parseInt(localStorage.getItem('protocolCount') || localStorage.getItem('protocolCounter') || '0');
+let denuncias = [];
+try {
+  denuncias = JSON.parse(localStorage.getItem('denuncias') || '[]')
+    .filter(d => d && d.id && d.status && d.tipo)
+    .map(d => (typeof LGPD !== 'undefined' && LGPD.decifrarDenuncia) ? LGPD.decifrarDenuncia(d) : d);
+} catch (e) {
+  console.warn('[Protege+] localStorage indisponível ou dados inválidos — iniciando vazio.', e);
+  denuncias = [];
+}
+let protocolCount = 0;
+try {
+  protocolCount = parseInt(localStorage.getItem('protocolCount') || localStorage.getItem('protocolCounter') || '0');
+} catch (e) { protocolCount = 0; }
 let lastProtocol  = '';
 
 // ════════════════════════════════════════════════════════════

@@ -1,0 +1,24 @@
+# ===== Backend Java / Maven =====
+backend/target/
+backend/data/
+*.class
+
+# ===== Logs =====
+*.log
+
+# ===== Node (caso use no futuro) =====
+node_modules/
+
+# ===== Segredos / ambiente (NUNCA subir chaves reais) =====
+.env
+*.env
+application-local.properties
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+
+# ===== Sistema operacional =====
+.DS_Store
+Thumbs.db

@@ -204,7 +204,8 @@ const I18n = (() => {
     }
   };
 
-  let idiomaAtual = localStorage.getItem('idioma') || 'pt';
+  let idiomaAtual = 'pt';
+  try { idiomaAtual = localStorage.getItem('idioma') || 'pt'; } catch (e) { idiomaAtual = 'pt'; }
 
   const BANDEIRAS = { pt: '🇧🇷', en: '🇺🇸' };
   const PROXIMO   = { pt: 'en',  en: 'pt'  };
@@ -236,10 +237,12 @@ const I18n = (() => {
   }
 
   function _atualizarBotao() {
-    const btn = document.getElementById('btn-idioma');
-    if (!btn) return;
-    btn.textContent = BANDEIRAS[idiomaAtual] || '🌐';
-    btn.title = idiomaAtual === 'pt' ? 'Switch to English' : 'Mudar para Português';
+    // Atualiza TODOS os botões de idioma (ha um no topo e outro na area do servidor)
+    const botoes = document.querySelectorAll('.lang-toggle');
+    botoes.forEach(btn => {
+      btn.textContent = BANDEIRAS[idiomaAtual] || '🌐';
+      btn.title = idiomaAtual === 'pt' ? 'Switch to English' : 'Mudar para Português';
+    });
   }
 
   function init() { aplicar(); _atualizarBotao(); }
