@@ -63,6 +63,14 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Programacao orientada a aspectos: a trilha de auditoria e
+             aplicada por @Auditavel + interceptador, e nao por chamadas
+             manuais espalhadas pelos servicos. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- Documentacao interativa da API (Swagger / OpenAPI) -->
         <dependency>
             <groupId>org.springdoc</groupId>

@@ -22,3 +22,9 @@ application-local.properties
 # ===== Sistema operacional =====
 .DS_Store
 Thumbs.db
+
+# ===== Artefatos de trabalho que nao entram na entrega =====
+_to_delete/
+database/massa_gerada.json
+*.bak
+*.orig

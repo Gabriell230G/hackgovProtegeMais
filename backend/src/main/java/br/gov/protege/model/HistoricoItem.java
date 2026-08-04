@@ -1,5 +1,6 @@
 package br.gov.protege.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 /**
@@ -8,8 +9,13 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class HistoricoItem {
 
+    @Column(nullable = false, length = 20)
     private String status;
+
+    @Column(nullable = false, length = 10)
     private String data;  // dd/MM/yyyy
+
+    @Column(nullable = false, length = 5)
     private String hora;  // HH:mm
 
     public HistoricoItem() {}

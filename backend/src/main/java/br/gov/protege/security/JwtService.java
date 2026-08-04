@@ -42,6 +42,17 @@ public class JwtService {
         return parse(token).getSubject();
     }
 
+    /**
+     * Perfil declarado no token.
+     *
+     * Devolve null quando a claim esta ausente: o filtro trata isso como
+     * ausencia de autorizacao, e nao como um perfil padrao permissivo.
+     */
+    public String extrairPerfil(String token) {
+        Object perfil = parse(token).get("role");
+        return perfil == null ? null : String.valueOf(perfil);
+    }
+
     public boolean valido(String token) {
         try {
             Date exp = parse(token).getExpiration();

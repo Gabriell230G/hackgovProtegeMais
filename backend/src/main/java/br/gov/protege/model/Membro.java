@@ -7,15 +7,20 @@ import jakarta.persistence.*;
  * atribuicao de responsaveis pelas denuncias).
  */
 @Entity
-@Table(name = "membro")
+@Table(name = "membro_equipe")
 public class Membro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 100)
     private String nome;
+
+    @Column(length = 80)
     private String cargo;
+
+    @Column(unique = true, length = 150)
     private String email;
 
     public Membro() {}

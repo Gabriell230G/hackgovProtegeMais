@@ -7,21 +7,25 @@ import jakarta.persistence.*;
  * A senha e armazenada com hash BCrypt.
  */
 @Entity
-@Table(name = "usuario")
+@Table(name = "servidor_publico")
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 150)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "senha_hash", nullable = false, length = 120)
     private String senhaHash;
 
+    @Column(length = 100)
     private String nome;
-    private String role = "GESTOR";
+
+    /** Chave estrangeira natural para a tabela PERFIL. */
+    @Column(name = "perfil", nullable = false, length = 20)
+    private String role = "ATENDENTE";
 
     public Usuario() {}
 
