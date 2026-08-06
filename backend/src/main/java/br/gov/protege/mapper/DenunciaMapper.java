@@ -25,6 +25,8 @@ public final class DenunciaMapper {
                 d.getTipo(),
                 d.getLocal(),
                 d.getStatus(),
+                d.getScore(),
+                d.getScoreTxt(),
                 d.getCriadoEm(),
                 d.getHistorico());
     }

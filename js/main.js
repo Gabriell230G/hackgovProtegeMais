@@ -915,7 +915,7 @@ function showDashTab(tab, el) {
     if (typeof showToast === 'function') showToast('🔒 Seu perfil não tem acesso a esta área.');
     return;
   }
-  ['resumo', 'backlog', 'status-d', 'mapa', 'kanban', 'equipe'].forEach(t => {
+  ['resumo', 'backlog', 'status-d', 'mapa', 'kanban', 'equipe', 'auditoria'].forEach(t => {
     const tabEl = document.getElementById('tab-' + t);
     if (tabEl) tabEl.style.display = 'none';
   });
@@ -928,7 +928,11 @@ function showDashTab(tab, el) {
   if (tab === 'resumo')   { updateKPIs(); setTimeout(initCharts, 50); if (typeof VigIA !== 'undefined') VigIA.analisar(); }
   if (tab === 'backlog')  { renderBacklog(); }
   if (tab === 'status-d') { renderStatusTable(); }
-  if (tab === 'kanban' && typeof Kanban !== 'undefined') { Kanban.render(); }
+  if (tab === 'kanban') {
+    if (typeof Kanban !== 'undefined') Kanban.render();
+    // Fila de prioridade e pilha de acoes vivem no servidor: recarrega ao abrir a aba
+    if (typeof Fluxo !== 'undefined') Fluxo.atualizar();
+  }
   if (tab === 'equipe' && typeof Equipe !== 'undefined') { Equipe.render(); }
   if (tab === 'mapa' && typeof MapaGestor !== 'undefined') {
     setTimeout(() => MapaGestor.init(), 150);

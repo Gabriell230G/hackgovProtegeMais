@@ -313,12 +313,75 @@ const Backend = (() => {
     return { iaAtiva: false, modo: 'Local' };
   }
 
+  // ── Fluxo de atendimento: fila de prioridade e pilha de ações ──
+  async function consultarFila(limite = 10) {
+    if (await estaOnline()) {
+      const res = await protegido(() =>
+        fetch(`${BASE}/fluxo/fila?limite=${limite}`, { headers: authHeaders() }));
+      if (res.ok) return res.json();
+      throw new Error(await erroDa(res));
+    }
+    return null;
+  }
+
+  async function atenderProximo() {
+    const res = await protegido(() =>
+      fetch(`${BASE}/fluxo/fila/atender`, { method: 'POST', headers: authHeaders() }));
+    if (res.ok) return res.json();
+    throw new Error(await erroDa(res));
+  }
+
+  async function consultarPilha() {
+    if (await estaOnline()) {
+      const res = await protegido(() => fetch(`${BASE}/fluxo/pilha`, { headers: authHeaders() }));
+      if (res.ok) return res.json();
+    }
+    return null;
+  }
+
+  async function desfazerUltima() {
+    const res = await protegido(() =>
+      fetch(`${BASE}/fluxo/desfazer`, { method: 'POST', headers: authHeaders() }));
+    if (res.ok) return res.json();
+    throw new Error(await erroDa(res));
+  }
+
+  // ── Trilha de auditoria (perfis AUDITOR e ADMIN) ──
+  async function consultarAuditoria(filtros = {}) {
+    const qs = new URLSearchParams(
+      Object.fromEntries(Object.entries(filtros).filter(([, v]) => v !== '' && v != null))
+    ).toString();
+    const res = await protegido(() =>
+      fetch(`${BASE}/auditoria${qs ? '?' + qs : ''}`, { headers: authHeaders() }));
+    if (res.status === 403) {
+      const e = new Error('Seu perfil não tem permissão para consultar a trilha de auditoria.');
+      e.status = 403;
+      throw e;
+    }
+    if (res.ok) return res.json();
+    throw new Error(await erroDa(res));
+  }
+
+  async function verificarIntegridade() {
+    const res = await protegido(() => fetch(`${BASE}/auditoria/integridade`, { headers: authHeaders() }));
+    if (res.ok) return res.json();
+    throw new Error(await erroDa(res));
+  }
+
+  async function acoesAuditadas() {
+    const res = await protegido(() => fetch(`${BASE}/auditoria/acoes`, { headers: authHeaders() }));
+    if (res.ok) return res.json();
+    return {};
+  }
+
   return {
     BASE, estaOnline, reavaliarConexao,
     login, logout, perfilAtual,
     criarDenuncia, listarDenuncias, listarPagina, detalharDenuncia, buscarProtocolo,
     atualizarDenuncia, excluirDenuncia, mudarStatus, atribuirResponsavel,
     listarEquipe, salvarMembro, removerMembro,
+    consultarFila, atenderProximo, consultarPilha, desfazerUltima,
+    consultarAuditoria, verificarIntegridade, acoesAuditadas,
     estatisticas, perguntarVigia, reanalisar, statusIa,
   };
 })();

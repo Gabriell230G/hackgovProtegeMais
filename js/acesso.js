@@ -1,101 +1,149 @@
 /**
- * acesso.js — Controle de Acesso por Papéis (Gestor Master)
+ * acesso.js — Controle de acesso por perfil (US24).
  *
- * Demonstra o princípio LGPD "cada papel vê apenas o que precisa".
- * Dois papéis:
- *   • MASTER   → vê tudo: identidade do denunciante, painel LGPD, equipe.
- *   • ANALISTA → trabalha as denúncias (kanban, status, resumo), mas
- *                NÃO vê a identidade de quem denunciou nem o painel LGPD.
+ * O seletor de perfil deixou de ser uma simulação de interface: trocar de
+ * perfil aqui faz um LOGIN REAL na API com credenciais diferentes, e o token
+ * emitido carrega a role correspondente. A partir daí, quem decide o que cada
+ * um pode fazer é o servidor — o front apenas reflete a decisão.
  *
- * A identidade é protegida mesmo internamente — coerente com o
- * diferencial do Protege+ de proteger quem denuncia.
+ * Isso importa porque esconder um botão não é controle de acesso. Se a
+ * restrição vivesse só aqui, bastaria abrir o console do navegador para
+ * contorná-la. Ao trocar para Atendente e abrir a Trilha de Auditoria, a API
+ * responde 403 e a própria tentativa fica registrada na trilha.
+ *
+ * Quatro perfis demonstráveis:
+ *   ADMIN     → acesso pleno, integralmente auditado.
+ *   GESTOR    → coordena o atendimento e vê identificação. NÃO vê a auditoria.
+ *   ATENDENTE → trabalha os casos sem acesso a dado identificável.
+ *   AUDITOR   → fiscaliza o uso do sistema, sem ver o relato das denúncias.
  */
-
 const Acesso = (() => {
 
   let papelAtual = 'master';
 
   const PERMISSOES = {
-    master:   { verIdentidade: true,  abas: ['resumo','backlog','status-d','kanban','equipe','mapa'], label: 'Gestor Master' },
-    analista: { verIdentidade: false, abas: ['resumo','backlog','status-d','kanban','mapa'],                  label: 'Analista' },
+    master: {
+      label: 'Administrador',
+      verIdentidade: true,
+      abas: ['resumo','backlog','status-d','kanban','equipe','mapa','auditoria'],
+      credenciais: { email: 'admin@protege.gov.br', senha: 'admin123' },
+      aviso: '🛡️ Perfil Administrador — acesso pleno, integralmente auditado.',
+    },
+    gestor: {
+      label: 'Gestor',
+      verIdentidade: true,
+      abas: ['resumo','backlog','status-d','kanban','equipe','mapa','auditoria'],
+      credenciais: { email: 'gestor@protege.gov.br', senha: 'gestor123' },
+      aviso: '👔 Perfil Gestor — vê identificação, mas a trilha de auditoria é negada pela API.',
+    },
+    analista: {
+      label: 'Atendente',
+      verIdentidade: false,
+      abas: ['resumo','backlog','status-d','kanban','mapa','auditoria'],
+      credenciais: { email: 'atendente@protege.gov.br', senha: 'atendente123' },
+      aviso: '👁️ Perfil Atendente — identidade e endereço protegidos pelo servidor.',
+    },
+    auditor: {
+      label: 'Auditor',
+      verIdentidade: false,
+      abas: ['resumo','auditoria'],
+      credenciais: { email: 'auditor@protege.gov.br', senha: 'auditor123' },
+      aviso: '🔎 Perfil Auditor — fiscaliza o uso do sistema, sem ver o relato das denúncias.',
+    },
   };
 
   function papel() { return papelAtual; }
-  function pode(acao) { return !!PERMISSOES[papelAtual]?.[acao]; }
-  function podeVerAba(aba) { return PERMISSOES[papelAtual]?.abas.includes(aba); }
+  function pode(acao) { return !!(PERMISSOES[papelAtual] && PERMISSOES[papelAtual][acao]); }
+  function podeVerAba(aba) {
+    return !!(PERMISSOES[papelAtual] && PERMISSOES[papelAtual].abas.indexOf(aba) >= 0);
+  }
+  function perfilServidor() {
+    return (typeof Backend !== 'undefined' && Backend.perfilAtual()) || null;
+  }
 
-  function definir(novoPapel, btn) {
-    if (!PERMISSOES[novoPapel]) return;
+  async function definir(novoPapel, btn) {
+    const cfg = PERMISSOES[novoPapel];
+    if (!cfg) return;
     papelAtual = novoPapel;
 
-    // botões
     document.querySelectorAll('.papel-opt').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
 
-    // rótulo do usuário
+    // Login real na API. O perfil efetivo passa a ser o que o token declara.
+    let perfilReal = null;
+    if (typeof Backend !== 'undefined' && await Backend.estaOnline()) {
+      Backend.logout();
+      const dados = await Backend.login(cfg.credenciais.email, cfg.credenciais.senha);
+      perfilReal = dados ? dados.role : null;
+    }
+
     const lbl = document.getElementById('user-role-label');
-    if (lbl) lbl.textContent = PERMISSOES[novoPapel].label + ' • SP';
+    if (lbl) {
+      lbl.textContent = perfilReal ? (cfg.label + ' • ' + perfilReal)
+                                   : (cfg.label + ' • modo local');
+    }
+    const nome = document.querySelector('.user-name');
+    if (nome) nome.textContent = cfg.credenciais.email;
 
     aplicar();
 
     if (typeof showToast === 'function') {
-      showToast(novoPapel === 'master'
-        ? '🛡️ Acesso Master — visão completa.'
-        : '👁️ Acesso Analista — identidade protegida.');
+      showToast(cfg.aviso + (perfilReal ? '' : ' (API fora do ar: restrição apenas local)'));
     }
   }
 
-  // Esconde abas não permitidas e re-renderiza a tela atual
+  /**
+   * Esconde do menu as abas que o perfil não usa e volta ao resumo se a aba
+   * aberta deixou de ser permitida.
+   *
+   * A aba de auditoria permanece VISÍVEL para os perfis operacionais de
+   * propósito: é ao abri-la e receber 403 que a segregação de acesso fica
+   * demonstrada. Esconder o botão pareceria segurança sem sê-la.
+   */
   function aplicar() {
-    // esconde/mostra itens do menu conforme o papel
     document.querySelectorAll('.sidebar-item').forEach(item => {
       const onclick = item.getAttribute('onclick') || '';
       const m = onclick.match(/showDashTab\('([^']+)'/);
-      if (m) {
-        const aba = m[1];
-        item.style.display = podeVerAba(aba) ? '' : 'none';
-      }
+      if (m) item.style.display = podeVerAba(m[1]) ? '' : 'none';
     });
 
-    // se a aba aberta não é mais permitida, volta pro resumo
     const abaAtiva = document.querySelector('.sidebar-item.active');
     if (abaAtiva) {
       const m = (abaAtiva.getAttribute('onclick') || '').match(/showDashTab\('([^']+)'/);
-      if (m && !podeVerAba(m[1])) {
-        if (typeof showDashTab === 'function') {
-          const resumoItem = document.querySelector(".sidebar-item[onclick*=\"'resumo'\"]");
-          showDashTab('resumo', resumoItem);
-        }
+      if (m && !podeVerAba(m[1]) && typeof showDashTab === 'function') {
+        showDashTab('resumo', document.querySelector(".sidebar-item[onclick*=\"'resumo'\"]"));
       }
     }
 
-    // re-renderiza telas que mostram identidade
     if (typeof renderStatusTable === 'function') renderStatusTable();
     if (typeof renderBacklog === 'function') renderBacklog();
     if (typeof Kanban !== 'undefined') Kanban.render();
   }
 
   /**
-   * Mascara a identidade de uma denúncia conforme o papel.
-   * Para o analista, nome/contato viram "[protegido]".
-   * A descrição NÃO é mascarada (é o conteúdo do caso, necessário ao trabalho).
+   * Mascaramento no cliente, para os dados que vivem no modo local.
+   *
+   * Quando a API está no ar o mascaramento já vem pronto do servidor — que é
+   * onde ele precisa acontecer. Este aqui cobre o plano B e mantém a tela
+   * coerente nos dois modos.
    */
   function mascarar(denuncia) {
     if (!denuncia) return denuncia;
-    if (pode('verIdentidade')) return denuncia;   // master vê tudo
-    const copia = { ...denuncia };
-    if (copia.nome)    copia.nome = '🔒 [protegido]';
-    if (copia.contato) copia.contato = '🔒 [protegido]';
+    if (pode('verIdentidade')) return denuncia;
+    const copia = Object.assign({}, denuncia);
+    if (copia.nome)     copia.nome = '🔒 [protegido]';
+    if (copia.contato)  copia.contato = '🔒 [protegido]';
+    if (copia.endereco) copia.endereco = '🔒 [endereço protegido]';
     return copia;
   }
 
-  function init() {
-    aplicar();
-  }
+  function init() { aplicar(); }
 
-  return { papel, pode, podeVerAba, definir, aplicar, mascarar, init };
+  return { papel, pode, podeVerAba, perfilServidor, definir, aplicar, mascarar, init, PERMISSOES };
 })();
 
+window.Acesso = Acesso;
+
 document.addEventListener('DOMContentLoaded', () => {
-  if (typeof Acesso !== 'undefined') setTimeout(() => Acesso.init(), 100);
+  setTimeout(() => Acesso.init(), 100);
 });

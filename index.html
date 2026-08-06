@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="./css/kanban.css">
   <link rel="stylesheet" href="./css/panico.css">
   <link rel="stylesheet" href="./css/lgpd.css">
+  <link rel="stylesheet" href="./css/painel-api.css">
   <style>
     /* ── DARK MODE ── */
     [data-theme="dark"] {
@@ -278,6 +279,16 @@
   </section>
 
   <section class="form-section" id="formulario">
+        <div class="react-link">
+          <span class="react-link-ic">⚛️</span>
+          <div>
+            <b>Versão em React deste formulário</b>
+            <div>Mesmo cadastro, implementado como componente React consumindo a mesma API.
+            Útil para comparar as duas abordagens de front-end.</div>
+          </div>
+          <a class="btn btn-secondary btn-sm" href="./formulario-react.html">Abrir</a>
+        </div>
+
     <h2 class="section-title"><span data-i18n="form.titulo">Fazer Denúncia</span></h2>
     <div class="form-container">
       <div class="form-row">
@@ -575,11 +586,15 @@
           <div class="user-role" id="user-role-label">Gestor Master • SP</div>
         </div>
       </div>
+      <!-- Origem dos dados exibidos: API ou armazenamento local (US22) -->
+      <div class="sidebar-conexao" id="sidebar-conexao"></div>
       <div class="papel-switch">
         <span class="papel-switch-lbl">Acessar como:</span>
         <div class="papel-opts">
-          <button class="papel-opt active" id="papel-master" onclick="Acesso.definir('master', this)">🛡️ Master</button>
-          <button class="papel-opt" id="papel-analista" onclick="Acesso.definir('analista', this)">👁️ Analista</button>
+          <button class="papel-opt active" id="papel-master"   onclick="Acesso.definir('master', this)">🛡️ Admin</button>
+          <button class="papel-opt"        id="papel-gestor"   onclick="Acesso.definir('gestor', this)">👔 Gestor</button>
+          <button class="papel-opt"        id="papel-analista" onclick="Acesso.definir('analista', this)">👁️ Atendente</button>
+          <button class="papel-opt"        id="papel-auditor"  onclick="Acesso.definir('auditor', this)">🔎 Auditor</button>
         </div>
       </div>
       <nav class="sidebar-nav">
@@ -600,6 +615,9 @@
         </div>
         <div class="sidebar-item" onclick="showDashTab('mapa', this)">
           <span class="item-icon">🗺️</span> <span data-i18n="mapa.nav">Mapa de Denúncias</span>
+        </div>
+        <div class="sidebar-item" id="nav-auditoria" onclick="showDashTab('auditoria', this); Auditoria.abrir()">
+          <span class="item-icon">🔎</span> Trilha de Auditoria
         </div>
       </nav>
     </aside>
@@ -819,6 +837,42 @@
             <div class="kanban-sub">Arraste um card entre as colunas para mudar o status. A mudança pede confirmação.</div>
           </div>
         </div>
+
+        <!-- FILA DE PRIORIDADE E PILHA DE ACOES (US20 / US21) -->
+        <div class="fluxo-grid">
+
+          <div class="fluxo-card">
+            <h4>⏱️ Fila de priorização</h4>
+            <div class="fluxo-sub">
+              Ordem sugerida de atendimento: urgência atribuída pelo VigIA, depois score de
+              confiabilidade e, por último, antiguidade — este critério evita que casos de
+              baixa urgência fiquem indefinidamente sem atendimento.
+            </div>
+            <div class="fluxo-meta" id="fila-meta"></div>
+            <div id="fila-conteudo"></div>
+            <div class="fluxo-acoes">
+              <button class="fluxo-btn primario" id="btn-atender" onclick="Fluxo.atenderProximo()">▶ Atender próximo</button>
+              <button class="fluxo-btn secundario" onclick="Fluxo.carregarFila()">Atualizar</button>
+            </div>
+          </div>
+
+          <div class="fluxo-card">
+            <h4>↩️ Ações reversíveis</h4>
+            <div class="fluxo-sub">
+              Histórico das suas mudanças de status, da mais recente para a mais antiga.
+              Desfazer <b>não apaga</b> o passo errado: acrescenta um evento novo restaurando
+              o status anterior, preservando a rastreabilidade do caso.
+            </div>
+            <div class="fluxo-meta" id="pilha-meta"></div>
+            <div id="pilha-conteudo"></div>
+            <div class="fluxo-acoes">
+              <button class="fluxo-btn primario" id="btn-desfazer" onclick="Fluxo.desfazer()">↩ Desfazer última</button>
+              <button class="fluxo-btn secundario" onclick="Fluxo.carregarPilha()">Atualizar</button>
+            </div>
+          </div>
+
+        </div>
+
         <div class="kanban-board" id="kanban-board"></div>
       </div>
 
@@ -828,18 +882,78 @@
           <div class="equipe-header">
             <div>
               <h3>👥 Equipe</h3>
-              <div class="equipe-sub">Cadastre os membros que poderão ser responsáveis pelas denúncias.</div>
+              <div class="equipe-sub">Cadastre os membros que poderão ser responsáveis pelas denúncias. O cadastro é servido pela API — cadastrar e remover exigem perfil Gestor ou Administrador.</div>
             </div>
           </div>
 
           <div class="equipe-form">
-            <input type="text" id="eq-nome" placeholder="Nome do membro">
-            <input type="text" id="eq-papel" placeholder="Papel / cargo (ex: Analista)">
-            <input type="text" id="eq-setor" placeholder="Setor / região (ex: Zona Norte)">
+            <input type="text"  id="eq-nome"  placeholder="Nome do membro">
+            <input type="text"  id="eq-cargo" placeholder="Cargo (ex: Analista de denúncias)">
+            <input type="email" id="eq-email" placeholder="E-mail institucional">
             <button class="btn btn-primary" onclick="Equipe.adicionar()">+ Adicionar</button>
           </div>
 
           <div class="equipe-lista" id="equipe-lista"></div>
+        </div>
+      </div>
+
+      <!-- TAB TRILHA DE AUDITORIA (US19 / US25) -->
+      <div class="dashboard-content" id="tab-auditoria" style="display:none">
+        <div class="kanban-header">
+          <div>
+            <h3>🔎 Trilha de Auditoria</h3>
+            <div class="kanban-sub">
+              Registro imutável das ações sensíveis, encadeado por SHA-256. Restrito aos perfis
+              Auditor e Administrador — quem opera o sistema não fiscaliza o próprio uso dele.
+              Tentativas recusadas também aparecem aqui.
+            </div>
+          </div>
+        </div>
+
+        <div class="aud-barra">
+          <div class="aud-campo">
+            <label for="aud-f-usuario">Usuário</label>
+            <input type="text" id="aud-f-usuario" placeholder="trecho do e-mail">
+          </div>
+          <div class="aud-campo">
+            <label for="aud-f-acao">Ação</label>
+            <select id="aud-f-acao"><option value="">todas</option></select>
+          </div>
+          <div class="aud-campo">
+            <label for="aud-f-inicio">De</label>
+            <input type="date" id="aud-f-inicio">
+          </div>
+          <div class="aud-campo">
+            <label for="aud-f-fim">Até</label>
+            <input type="date" id="aud-f-fim">
+          </div>
+          <button class="fluxo-btn primario" onclick="Auditoria.carregar(0)">Filtrar</button>
+          <button class="fluxo-btn secundario" onclick="Auditoria.limpar()">Limpar</button>
+          <button class="fluxo-btn secundario" onclick="Auditoria.verificarIntegridade()">🔐 Verificar integridade</button>
+        </div>
+
+        <div class="aud-integridade" id="aud-integridade">
+          Cada registro guarda o hash do anterior. Alterar ou remover qualquer linha invalida
+          a cadeia — clique em <b>Verificar integridade</b> para recalcular tudo e ver se algum
+          elo foi rompido.
+        </div>
+
+        <div class="aud-tabela-wrap">
+          <table id="aud-table">
+            <thead>
+              <tr>
+                <th>Data e hora</th><th>Usuário</th><th>Ação</th>
+                <th>Recurso</th><th>Resultado</th><th>Origem</th><th>Encadeamento</th>
+              </tr>
+            </thead>
+            <tbody id="aud-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="aud-paginacao">
+          <button class="fluxo-btn secundario" id="aud-ant"  onclick="Auditoria.anterior()">← Anterior</button>
+          <button class="fluxo-btn secundario" id="aud-prox" onclick="Auditoria.proxima()">Próxima →</button>
+          <span id="aud-info"></span>
         </div>
       </div>
 
@@ -971,6 +1085,9 @@
 <script src="./js/lgpd.js"></script>
 <script src="./js/acesso.js"></script>
 <script src="./js/backend.js"></script>
+  <script src="./js/conexao.js"></script>
+  <script src="./js/fluxo.js"></script>
+  <script src="./js/auditoria.js"></script>
 <script src="./js/main.js"></script>
 
 <script>
