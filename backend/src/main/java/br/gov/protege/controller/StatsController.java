@@ -1,7 +1,9 @@
 package br.gov.protege.controller;
 
+import br.gov.protege.dto.RelatorioAnaliticoResponse;
 import br.gov.protege.model.Denuncia;
 import br.gov.protege.repository.DenunciaRepository;
+import br.gov.protege.service.RelatorioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,9 +31,11 @@ import java.util.stream.Collectors;
 public class StatsController {
 
     private final DenunciaRepository repo;
+    private final RelatorioService relatorio;
 
-    public StatsController(DenunciaRepository repo) {
+    public StatsController(DenunciaRepository repo, RelatorioService relatorio) {
         this.repo = repo;
+        this.relatorio = relatorio;
     }
 
     @Operation(summary = "Resumo do canal",
@@ -53,6 +57,26 @@ public class StatsController {
                 .count());
         out.put("scoreMedio", todas.stream().mapToInt(Denuncia::getScore).average().orElse(0));
         return out;
+    }
+
+    @Operation(summary = "Relatorio estatistico do canal",
+               description = """
+                       Estatistica descritiva completa sobre tempo de atendimento e score de
+                       confiabilidade: media, mediana, moda, variancia, desvio-padrao, coeficiente
+                       de variacao, quartis, outliers pela regra de Tukey, assimetria de Pearson e
+                       correlacao entre score e tempo de conclusao. Traz ainda os recortes por tipo
+                       de denuncia, por urgencia atribuida pela IA e por escolha de anonimato.
+
+                       A resposta e integralmente agregada: nenhum campo permite chegar a um caso
+                       individual. Por isso esta consulta nao gera registro de auditoria - nao ha
+                       dado pessoal sendo acessado, e auditar leitura de agregado so encheria a
+                       trilha de ruido, dificultando encontrar os acessos que de fato importam.
+                       """,
+               security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", description = "Relatorio calculado")
+    @GetMapping("/analitico")
+    public RelatorioAnaliticoResponse analitico() {
+        return relatorio.gerar();
     }
 
     private Map<String, Long> contarPor(List<Denuncia> lista, Function<Denuncia, String> chave) {

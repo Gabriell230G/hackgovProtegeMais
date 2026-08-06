@@ -283,6 +283,21 @@ const Backend = (() => {
     return { total: lista.length, porStatus: {}, porTipo: {}, offline: true };
   }
 
+  /**
+   * Relatorio estatistico completo (Parte 4).
+   *
+   * Devolve null quando a API esta fora do ar, em vez de inventar um
+   * substituto local. Media e desvio calculados sobre o punhado de
+   * denuncias que por acaso estao neste navegador nao descreveriam o
+   * canal - e a tela ficaria indistinguivel de uma que descreve.
+   */
+  async function relatorioAnalitico() {
+    if (!(await estaOnline())) return null;
+    const res = await protegido(() => fetch(`${BASE}/stats/analitico`, { headers: authHeaders() }));
+    if (res.ok) return res.json();
+    throw Object.assign(new Error(await erroDa(res)), { status: res.status });
+  }
+
   // ── VigIA (IA) ───────────────────────────────────────────────
   async function perguntarVigia(pergunta) {
     if (await estaOnline()) {
@@ -382,7 +397,7 @@ const Backend = (() => {
     listarEquipe, salvarMembro, removerMembro,
     consultarFila, atenderProximo, consultarPilha, desfazerUltima,
     consultarAuditoria, verificarIntegridade, acoesAuditadas,
-    estatisticas, perguntarVigia, reanalisar, statusIa,
+    estatisticas, relatorioAnalitico, perguntarVigia, reanalisar, statusIa,
   };
 })();
 

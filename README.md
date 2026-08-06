@@ -124,8 +124,11 @@ O gestor **não** consulta a trilha de auditoria: quem opera o sistema não fisc
 | `PUT` | `/api/equipe/{id}` | GESTOR, ADMIN | Atualiza membro |
 | `DELETE` | `/api/equipe/{id}` | GESTOR, ADMIN | Remove membro |
 | `GET` | `/api/stats` | 🔒 | Totais por status, tipo, urgência e UF |
+| `GET` | `/api/stats/analitico` | 🔒 | Relatório estatístico completo: medidas de posição e dispersão, quartis, outliers, assimetria, correlação e recortes por tipo, urgência e anonimato |
 
-São **25 mapeamentos** no total. **12** deles estão anotados com `@Auditavel` e alimentam a trilha — inclusive as tentativas recusadas.
+São **26 mapeamentos** no total. **12** deles estão anotados com `@Auditavel` e alimentam a trilha — inclusive as tentativas recusadas.
+
+`/api/stats/analitico` deliberadamente **não** gera registro de auditoria: a resposta é integralmente agregada, nenhum campo permite chegar a um caso individual, e auditar leitura de agregado só encheria a trilha de ruído — dificultando justamente encontrar os acessos que importam.
 
 ### Fluxo de atendimento — estruturas de dados
 
@@ -157,7 +160,9 @@ São **25 mapeamentos** no total. **12** deles estão anotados com `@Auditavel` 
 
 **Cidadão** — denúncia com anonimato graduado em três níveis, incluindo canal de retorno anônimo bidirecional; consulta por protocolo; botão de emergência com geolocalização; **Modo Seguro**, que disfarça a tela como um buscador; botão de pânico com saída imediata; múltiplos idiomas; chatbot de atendimento.
 
-**Gestor** — login com perfil, Kanban das denúncias, gestão de equipe, mapa coroplético com limiar de privacidade, score de confiabilidade, painel de estatísticas, fila de priorização automática e o **VigIA**, copiloto que classifica urgência e resume relatos.
+**Gestor** — login com perfil, Kanban das denúncias, gestão de equipe, mapa coroplético com limiar de privacidade, score de confiabilidade, fila de priorização automática, pilha de ações reversíveis, trilha de auditoria e o **VigIA**, copiloto que classifica urgência e resume relatos.
+
+**Relatório estatístico** — aba própria no painel, com seis gráficos alimentados por `/api/stats/analitico`. Cada gráfico vem acompanhado da **leitura do que ele mostra**, gerada a partir dos próprios números e não de frases fixas: um gráfico sem leitura transfere para o gestor o trabalho de interpretar, que é justamente o que o painel deveria estar fazendo por ele.
 
 **Segurança e privacidade** — JWT com perfil real, mascaramento de dados por perfil, cifragem de campo em repouso, exclusão lógica com anonimização, trilha de auditoria imutável e k-anonimato no mapa (municípios com menos de 3 denúncias não são detalhados, para impedir reidentificação).
 
@@ -173,9 +178,11 @@ A pasta `database/` traz o modelo físico completo em Oracle:
 | `02_dml_carga.sql` | Domínios, equipe, servidores e 120 denúncias geradas deterministicamente |
 | `03_consultas.sql` | Consultas analíticas do relatório e consultas de auditoria |
 
+**Não existem duas massas de dados.** O `data.sql` do backend e o `02_dml_carga.sql` carregam exatamente as mesmas **125 denúncias** (120 geradas deterministicamente com semente 561601 mais 5 de demonstração) e os mesmos **201 eventos de histórico** — uma em sintaxe H2, outra em sintaxe Oracle. É por isso que os números do painel, os do relatório impresso e os que `03_consultas.sql` devolve são idênticos, e podem ser conferidos um a um por quem avalia.
+
 As tabelas de domínio usam **chave natural**: a sigla é a própria chave primária. Por isso as colunas `tipo` e `status` que a aplicação grava **são** as chaves estrangeiras — o modelo documentado é o mesmo que a aplicação usa, e não um diagrama paralelo.
 
-A massa de 120 denúncias é determinística (semente 561601) e serve à análise estatística do relatório. É diferente do `data.sql` do backend, que carrega 5 denúncias apenas para a navegação da demonstração.
+As 120 denúncias geradas não têm endereço nem relato: são insumo estatístico. As 5 de demonstração carregam o conteúdo sensível — é nelas que o mascaramento por perfil tem o que esconder.
 
 ---
 
@@ -186,7 +193,9 @@ cd backend
 .\build.cmd clean test
 ```
 
-**24 testes** em 5 classes, cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha e detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou.
+**49 testes** em 7 classes, cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha, detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou — e toda a estatística descritiva do relatório.
+
+Os valores esperados nos testes de estatística foram calculados à mão e estão documentados no cabeçalho de cada classe. Um teste que confere o programa contra a saída do próprio programa passa a fingir que a conta está certa exatamente quando ela deixa de estar.
 
 Um dos testes existe por causa de um bug real: a data-hora era gravada com precisão de nanossegundo e relida truncada pelo banco, o que quebrava o hash de registros legítimos. O teste fixa o truncamento em milissegundos para que ninguém o remova sem perceber.
 
@@ -204,11 +213,12 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
 │   ├── kanban.css              painel do servidor
 │   ├── painel-api.css          etiqueta de conexão, fila, pilha e auditoria
 │   └── anonimato · emergencia · lgpd · panico
-├── js/                         23 módulos
+├── js/                         24 módulos
 │   ├── backend.js              ponte com a API (JWT + fallback localStorage)
 │   ├── conexao.js              etiqueta de origem dos dados: API ou local
 │   ├── fluxo.js                fila de priorização e pilha de desfazer
 │   ├── auditoria.js            consulta da trilha e verificação de integridade
+│   ├── estatistica.js          relatório estatístico com gráficos e leitura de cada um
 │   ├── acesso.js               troca de perfil com login real na API
 │   ├── equipe.js               equipe servida pela API, com cache em memória
 │   ├── anonimato.js            anonimato graduado e elo de mão dupla
@@ -224,19 +234,19 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
     ├── build.cmd / build.ps1   bootstrap: baixa o Maven se necessário
     ├── pom.xml
     └── src/
-        ├── main/java/br/gov/protege/      49 classes
+        ├── main/java/br/gov/protege/      52 classes
         │   ├── audit/        @Auditavel e o interceptador da trilha
         │   ├── config/       OpenAPI
-        │   ├── controller/   7 controladores, 25 rotas, tratamento de erros
+        │   ├── controller/   7 controladores, 26 rotas, tratamento de erros
         │   ├── dto/          contratos de entrada e saída
         │   ├── exception/    exceções de domínio
         │   ├── mapper/       entidade → resposta, por perfil
         │   ├── model/        entidades JPA
         │   ├── repository/   Spring Data JPA
         │   ├── security/     JWT, RBAC, CORS, limite de requisições
-        │   ├── service/      score, IA, fila, pilha e auditoria
+        │   ├── service/      score, IA, fila, pilha, auditoria e estatística
         │   └── util/         mascaramento de dados pessoais
-        └── test/java/...     5 classes, 24 testes JUnit
+        └── test/java/...     7 classes, 49 testes JUnit
 ```
 
 ---

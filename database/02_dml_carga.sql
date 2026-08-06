@@ -10,7 +10,7 @@
 --  numero a numero contra este arquivo e contra o script 03.
 --
 --  Parametros da geracao:
---    120 denuncias entre 02/03/2026 e 28/06/2026
+--    120 denuncias geradas, entre 02/03/2026 e 28/06/2026
 --    75 concluidas (alimentam o lead time) e 45 em aberto
 --    91 anonimas e 29 identificadas (estas geram linha em CIDADAO)
 --    Lead time por tipo, em dias (media / desvio). A hipotese embutida - e
@@ -18,10 +18,14 @@
 --      violencia 3.2/1.6 | abuso 4.1/2.0 | assedio 7.8/3.4
 --      discriminacao 8.6/3.9 | outros 11.2/5.1
 --
---  OBSERVACAO: esta massa e a base do RELATORIO ESTATISTICO. Ela e diferente
---  do data.sql do backend, que carrega apenas 5 denuncias de demonstracao no
---  H2 para a navegacao do painel. Sao dois propositos distintos: um alimenta
---  a analise, o outro alimenta a demonstracao.
+--  Somam-se a elas as 5 denuncias de demonstracao (ids 121-125), as mesmas
+--  que o backend carrega no H2. TOTAL: 125 registros, 76 concluidos.
+--
+--  IMPORTANTE: nao existem duas massas. Este script e o data.sql do backend
+--  carregam exatamente as mesmas 125 linhas, uma em sintaxe Oracle e outra
+--  em sintaxe H2. E por isso que os numeros do relatorio da Parte 4, os que
+--  o painel exibe e os que 03_consultas.sql devolve sao os mesmos - e podem
+--  ser conferidos um a um por quem avalia.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
@@ -95,7 +99,7 @@ INSERT INTO CIDADAO (id, nome, email, telefone) VALUES (28, 'Camila Prado', 'cam
 INSERT INTO CIDADAO (id, nome, email, telefone) VALUES (29, 'Camila Prado', 'camila.prado29@exemplo.com', '(14) 99481-7041');
 
 -- -----------------------------------------------------------------------------
--- DENUNCIAS (120 registros)
+-- DENUNCIAS GERADAS (120 registros)
 -- -----------------------------------------------------------------------------
 INSERT INTO DENUNCIA (id, protocolo, cidadao_id, tipo, status, responsavel_id, descricao, estado, cidade, localidade, score, score_label, score_txt, urgencia_ia, origem_analise, anonimo, criado_em, concluida_em) VALUES (1, '#2026-10001', 1, 'violencia', 'recebida', 1, 'Registro de violencia em Rio de Janeiro. Massa de teste deterministica para analise estatistica.', 'RJ', 'Rio de Janeiro', 'Rio de Janeiro, RJ', 81, 'high', 'Alta', 'ALTA', 'REGRAS', 0, TO_TIMESTAMP('2026-05-27 19:50:00', 'YYYY-MM-DD HH24:MI:SS'), NULL);
 INSERT INTO DENUNCIA (id, protocolo, cidadao_id, tipo, status, responsavel_id, descricao, estado, cidade, localidade, score, score_label, score_txt, urgencia_ia, origem_analise, anonimo, criado_em, concluida_em) VALUES (2, '#2026-10002', NULL, 'discriminacao', 'recebida', 2, 'Registro de discriminacao em Belo Horizonte. Massa de teste deterministica para analise estatistica.', 'MG', 'Belo Horizonte', 'Belo Horizonte, MG', 63, 'medium', 'Media', 'ALTA', 'REGRAS', 1, TO_TIMESTAMP('2026-04-09 01:50:00', 'YYYY-MM-DD HH24:MI:SS'), NULL);
@@ -416,6 +420,32 @@ INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (
 INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (119, 1, 'concluida', '02/05/2026', '08:17');
 INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (120, 0, 'recebida', '13/04/2026', '06:30');
 INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (120, 1, 'concluida', '23/04/2026', '19:47');
+
+-- -----------------------------------------------------------------------------
+-- DENUNCIAS DE DEMONSTRACAO (5 registros, ids 121-125)
+--
+-- Sao as mesmas cinco que o backend carrega no H2. Estao aqui para que o
+-- painel, este script e o relatorio da Parte 4 descrevam exatamente o mesmo
+-- universo de 125 registros - um avaliador que rode 03_consultas.sql tem de
+-- encontrar na tela os numeros que o PDF afirma.
+--
+-- Diferente das 120 geradas, estas carregam endereco e relato: sao elas que
+-- dao ao mascaramento por perfil algo concreto para esconder na demonstracao.
+-- -----------------------------------------------------------------------------
+INSERT INTO DENUNCIA (id, protocolo, cidadao_id, tipo, status, responsavel_id, descricao, estado, cidade, localidade, endereco, score, score_label, score_txt, urgencia_ia, resumo_ia, origem_analise, anonimo, criado_em, concluida_em) VALUES (121, '#2026-00451', NULL, 'violencia', 'recebida', NULL, 'Relato de violencia domestica no bairro Jardim Paulista, com ameacas frequentes.', 'SP', 'Sao Paulo', 'Sao Paulo, SP', 'Rua Paulista, 100 - Jardim Paulista', 65, 'medium', 'Media', 'ALTA', 'Violencia domestica recorrente. Priorizar contato com a rede de protecao.', 'REGRAS', 1, TO_TIMESTAMP('2026-04-20 14:32:00', 'YYYY-MM-DD HH24:MI:SS'), NULL);
+INSERT INTO DENUNCIA (id, protocolo, cidadao_id, tipo, status, responsavel_id, descricao, estado, cidade, localidade, endereco, score, score_label, score_txt, urgencia_ia, resumo_ia, origem_analise, anonimo, criado_em, concluida_em) VALUES (122, '#2026-00452', NULL, 'assedio', 'analise', NULL, 'Assedio no ambiente de trabalho relatado pelo denunciante identificado.', 'RJ', 'Rio de Janeiro', 'Rio de Janeiro, RJ', 'Av. Rio Branco, 500', 80, 'high', 'Alta', 'MEDIA', 'Assedio laboral com denunciante identificado. Boa verificabilidade.', 'REGRAS', 0, TO_TIMESTAMP('2026-04-21 09:10:00', 'YYYY-MM-DD HH24:MI:SS'), NULL);
+INSERT INTO DENUNCIA (id, protocolo, cidadao_id, tipo, status, responsavel_id, descricao, estado, cidade, localidade, endereco, score, score_label, score_txt, urgencia_ia, resumo_ia, origem_analise, anonimo, criado_em, concluida_em) VALUES (123, '#2026-00453', NULL, 'abuso', 'encaminhada', NULL, 'Abuso reportado na comunidade local envolvendo pessoa vulneravel.', 'BA', 'Salvador', 'Salvador, BA', 'Rua da Bahia, 200', 45, 'medium', 'Media', 'ALTA', 'Abuso contra vulneravel. Encaminhar ao orgao de protecao competente.', 'REGRAS', 1, TO_TIMESTAMP('2026-04-22 08:05:00', 'YYYY-MM-DD HH24:MI:SS'), NULL);
+INSERT INTO DENUNCIA (id, protocolo, cidadao_id, tipo, status, responsavel_id, descricao, estado, cidade, localidade, endereco, score, score_label, score_txt, urgencia_ia, resumo_ia, origem_analise, anonimo, criado_em, concluida_em) VALUES (124, '#2026-00454', NULL, 'discriminacao', 'concluida', NULL, 'Discriminacao racial em estabelecimento comercial, com testemunhas.', 'PE', 'Recife', 'Recife, PE', 'Av. Boa Viagem, 1200', 90, 'high', 'Alta', 'MEDIA', 'Discriminacao com testemunhas. Caso concluido com encaminhamento.', 'REGRAS', 0, TO_TIMESTAMP('2026-04-22 10:00:00', 'YYYY-MM-DD HH24:MI:SS'), TO_TIMESTAMP('2026-04-27 16:20:00', 'YYYY-MM-DD HH24:MI:SS'));
+INSERT INTO DENUNCIA (id, protocolo, cidadao_id, tipo, status, responsavel_id, descricao, estado, cidade, localidade, endereco, score, score_label, score_txt, urgencia_ia, resumo_ia, origem_analise, anonimo, criado_em, concluida_em) VALUES (125, '#2026-00455', NULL, 'violencia', 'recebida', NULL, 'Denuncia de violencia fisica em via publica agora, pedido de socorro.', 'MG', 'Belo Horizonte', 'Belo Horizonte, MG', 'Rua Goias, 800', 30, 'low', 'Baixa', 'CRITICA', 'Violencia em curso com termos de risco. Acionar resposta imediata.', 'REGRAS', 1, TO_TIMESTAMP('2026-04-23 17:55:00', 'YYYY-MM-DD HH24:MI:SS'), NULL);
+
+-- Linha do tempo das cinco de demonstracao
+INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (121, 0, 'recebida', '20/04/2026', '14:32');
+INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (122, 0, 'recebida', '21/04/2026', '09:10');
+INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (122, 1, 'analise', '22/04/2026', '11:45');
+INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (123, 0, 'recebida', '22/04/2026', '08:05');
+INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (124, 0, 'recebida', '22/04/2026', '10:00');
+INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (124, 1, 'concluida', '27/04/2026', '16:20');
+
 -- -----------------------------------------------------------------------------
 -- REINICIO DAS SEQUENCIAS DE IDENTITY
 --
@@ -427,7 +457,7 @@ INSERT INTO DENUNCIA_HISTORICO (denuncia_id, ordem, status, data, hora) VALUES (
 ALTER TABLE CIDADAO          MODIFY (id GENERATED BY DEFAULT AS IDENTITY (START WITH 30));
 ALTER TABLE MEMBRO_EQUIPE    MODIFY (id GENERATED BY DEFAULT AS IDENTITY (START WITH 4));
 ALTER TABLE SERVIDOR_PUBLICO MODIFY (id GENERATED BY DEFAULT AS IDENTITY (START WITH 5));
-ALTER TABLE DENUNCIA         MODIFY (id GENERATED BY DEFAULT AS IDENTITY (START WITH 121));
+ALTER TABLE DENUNCIA         MODIFY (id GENERATED BY DEFAULT AS IDENTITY (START WITH 126));
 
 COMMIT;
 

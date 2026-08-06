@@ -616,6 +616,9 @@
         <div class="sidebar-item" onclick="showDashTab('mapa', this)">
           <span class="item-icon">🗺️</span> <span data-i18n="mapa.nav">Mapa de Denúncias</span>
         </div>
+        <div class="sidebar-item" id="nav-estatistica" onclick="showDashTab('estatistica', this)">
+          <span class="item-icon">📈</span> <span data-i18n="nav.estatistica">Relatório estatístico</span>
+        </div>
         <div class="sidebar-item" id="nav-auditoria" onclick="showDashTab('auditoria', this); Auditoria.abrir()">
           <span class="item-icon">🔎</span> <span data-i18n="nav.auditoria">Trilha de Auditoria</span>
         </div>
@@ -897,6 +900,67 @@
         </div>
       </div>
 
+      <!-- TAB RELATORIO ESTATISTICO (US23 - Parte 4) -->
+      <div class="dashboard-content" id="tab-estatistica" style="display:none">
+        <div class="kanban-header">
+          <div>
+            <h3 data-i18n="est.titulo">📈 Relatório estatístico do canal</h3>
+            <div class="kanban-sub" data-i18n="est.sub">
+              Estatística descritiva sobre o tempo de atendimento e o score de confiabilidade.
+              Todo o cálculo acontece no servidor: média, mediana, desvio-padrão, quartis,
+              outliers e correlação vêm prontos da API, para que a tela e o relatório impresso
+              nunca discordem. Cada gráfico traz a leitura do que ele mostra.
+            </div>
+          </div>
+          <button class="fluxo-btn secundario" onclick="Estatistica.carregar()" data-i18n="fluxo.atualizar">Atualizar</button>
+        </div>
+
+        <div class="est-aviso oculto" id="est-aviso"></div>
+        <div class="est-referencia" id="est-referencia"></div>
+
+        <div class="est-cartoes" id="est-cartoes"></div>
+
+        <div class="est-grade">
+
+          <div class="est-card">
+            <h4 data-i18n="est.g.hist">Distribuição do tempo até a conclusão</h4>
+            <div class="est-canvas"><canvas id="est-histograma"></canvas></div>
+            <div class="est-leitura" id="est-leitura-histograma"></div>
+          </div>
+
+          <div class="est-card">
+            <h4 data-i18n="est.g.tipo">Tempo médio por tipo de denúncia</h4>
+            <div class="est-canvas"><canvas id="est-tipo"></canvas></div>
+            <div class="est-leitura" id="est-leitura-tipo"></div>
+          </div>
+
+          <div class="est-card">
+            <h4 data-i18n="est.g.urgencia">Tempo médio por urgência atribuída pelo VigIA</h4>
+            <div class="est-canvas"><canvas id="est-urgencia"></canvas></div>
+            <div class="est-leitura" id="est-leitura-urgencia"></div>
+          </div>
+
+          <div class="est-card destaque">
+            <h4 data-i18n="est.g.aberto">Espera dos casos ainda em aberto</h4>
+            <div class="est-canvas"><canvas id="est-aberto"></canvas></div>
+            <div class="est-leitura" id="est-leitura-aberto"></div>
+          </div>
+
+          <div class="est-card">
+            <h4 data-i18n="est.g.dispersao">Score de confiabilidade × tempo até concluir</h4>
+            <div class="est-canvas"><canvas id="est-dispersao"></canvas></div>
+            <div class="est-leitura" id="est-leitura-dispersao"></div>
+          </div>
+
+          <div class="est-card">
+            <h4 data-i18n="est.g.prazo">Percentual de casos concluídos dentro do prazo</h4>
+            <div class="est-canvas"><canvas id="est-prazo"></canvas></div>
+            <div class="est-leitura" id="est-leitura-prazo"></div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- TAB TRILHA DE AUDITORIA (US19 / US25) -->
       <div class="dashboard-content" id="tab-auditoria" style="display:none">
         <div class="kanban-header">
@@ -1088,6 +1152,7 @@
   <script src="./js/conexao.js"></script>
   <script src="./js/fluxo.js"></script>
   <script src="./js/auditoria.js"></script>
+  <script src="./js/estatistica.js"></script>
 <script src="./js/main.js"></script>
 
 <script>

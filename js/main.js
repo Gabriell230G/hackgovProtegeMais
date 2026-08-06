@@ -915,7 +915,7 @@ function showDashTab(tab, el) {
     if (typeof showToast === 'function') showToast('🔒 Seu perfil não tem acesso a esta área.');
     return;
   }
-  ['resumo', 'backlog', 'status-d', 'mapa', 'kanban', 'equipe', 'auditoria'].forEach(t => {
+  ['resumo', 'backlog', 'status-d', 'mapa', 'kanban', 'equipe', 'estatistica', 'auditoria'].forEach(t => {
     const tabEl = document.getElementById('tab-' + t);
     if (tabEl) tabEl.style.display = 'none';
   });
@@ -934,6 +934,9 @@ function showDashTab(tab, el) {
     if (typeof Fluxo !== 'undefined') Fluxo.atualizar();
   }
   if (tab === 'equipe' && typeof Equipe !== 'undefined') { Equipe.render(); }
+  // O relatorio e calculado no servidor a cada abertura: os numeros mudam
+  // conforme a equipe conclui casos, e um cache mudo seria pior que esperar.
+  if (tab === 'estatistica' && typeof Estatistica !== 'undefined') { Estatistica.carregar(); }
   if (tab === 'mapa' && typeof MapaGestor !== 'undefined') {
     setTimeout(() => MapaGestor.init(), 150);
   }
