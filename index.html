@@ -282,11 +282,11 @@
         <div class="react-link">
           <span class="react-link-ic">⚛️</span>
           <div>
-            <b>Versão em React deste formulário</b>
-            <div>Mesmo cadastro, implementado como componente React consumindo a mesma API.
+            <b data-i18n="react.titulo">Versão em React deste formulário</b>
+            <div data-i18n="react.sub">Mesmo cadastro, implementado como componente React consumindo a mesma API.
             Útil para comparar as duas abordagens de front-end.</div>
           </div>
-          <a class="btn btn-secondary btn-sm" href="./formulario-react.html">Abrir</a>
+          <a class="btn btn-secondary btn-sm" href="./formulario-react.html" data-i18n="react.abrir">Abrir</a>
         </div>
 
     <h2 class="section-title"><span data-i18n="form.titulo">Fazer Denúncia</span></h2>
@@ -589,35 +589,35 @@
       <!-- Origem dos dados exibidos: API ou armazenamento local (US22) -->
       <div class="sidebar-conexao" id="sidebar-conexao"></div>
       <div class="papel-switch">
-        <span class="papel-switch-lbl">Acessar como:</span>
+        <span class="papel-switch-lbl" data-i18n="painel.acessar_como">Acessar como:</span>
         <div class="papel-opts">
-          <button class="papel-opt active" id="papel-master"   onclick="Acesso.definir('master', this)">🛡️ Admin</button>
-          <button class="papel-opt"        id="papel-gestor"   onclick="Acesso.definir('gestor', this)">👔 Gestor</button>
-          <button class="papel-opt"        id="papel-analista" onclick="Acesso.definir('analista', this)">👁️ Atendente</button>
-          <button class="papel-opt"        id="papel-auditor"  onclick="Acesso.definir('auditor', this)">🔎 Auditor</button>
+          <button class="papel-opt active" id="papel-master"   onclick="Acesso.definir('master', this)"   data-i18n="painel.perfil.admin">🛡️ Admin</button>
+          <button class="papel-opt"        id="papel-gestor"   onclick="Acesso.definir('gestor', this)"   data-i18n="painel.perfil.gestor">👔 Gestor</button>
+          <button class="papel-opt"        id="papel-analista" onclick="Acesso.definir('analista', this)" data-i18n="painel.perfil.atendente">👁️ Atendente</button>
+          <button class="papel-opt"        id="papel-auditor"  onclick="Acesso.definir('auditor', this)"  data-i18n="painel.perfil.auditor">🔎 Auditor</button>
         </div>
       </div>
       <nav class="sidebar-nav">
         <div class="sidebar-item active" onclick="showDashTab('resumo', this)">
-          <span class="item-icon">📊</span> Resumo
+          <span class="item-icon">📊</span> <span data-i18n="nav.resumo">Resumo</span>
         </div>
         <div class="sidebar-item" onclick="showDashTab('backlog', this)">
-          <span class="item-icon">📋</span> Backlog Denúncias
+          <span class="item-icon">📋</span> <span data-i18n="nav.backlog">Backlog Denúncias</span>
         </div>
         <div class="sidebar-item" onclick="showDashTab('status-d', this)">
-          <span class="item-icon">⚙️</span> Status das Denúncias
+          <span class="item-icon">⚙️</span> <span data-i18n="nav.status_d">Status das Denúncias</span>
         </div>
         <div class="sidebar-item" onclick="showDashTab('kanban', this)">
-          <span class="item-icon">🗂️</span> Kanban
+          <span class="item-icon">🗂️</span> <span data-i18n="nav.kanban">Kanban</span>
         </div>
         <div class="sidebar-item" onclick="showDashTab('equipe', this)">
-          <span class="item-icon">👥</span> Equipe
+          <span class="item-icon">👥</span> <span data-i18n="nav.equipe">Equipe</span>
         </div>
         <div class="sidebar-item" onclick="showDashTab('mapa', this)">
           <span class="item-icon">🗺️</span> <span data-i18n="mapa.nav">Mapa de Denúncias</span>
         </div>
         <div class="sidebar-item" id="nav-auditoria" onclick="showDashTab('auditoria', this); Auditoria.abrir()">
-          <span class="item-icon">🔎</span> Trilha de Auditoria
+          <span class="item-icon">🔎</span> <span data-i18n="nav.auditoria">Trilha de Auditoria</span>
         </div>
       </nav>
     </aside>
@@ -833,8 +833,8 @@
       <div class="dashboard-content" id="tab-kanban" style="display:none">
         <div class="kanban-header">
           <div>
-            <h3>🗂️ Kanban de Denúncias</h3>
-            <div class="kanban-sub">Arraste um card entre as colunas para mudar o status. A mudança pede confirmação.</div>
+            <h3 data-i18n="kanban.titulo">🗂️ Kanban de Denúncias</h3>
+            <div class="kanban-sub" data-i18n="kanban.sub">Arraste um card entre as colunas para mudar o status. A mudança pede confirmação.</div>
           </div>
         </div>
 
@@ -842,8 +842,8 @@
         <div class="fluxo-grid">
 
           <div class="fluxo-card">
-            <h4>⏱️ Fila de priorização</h4>
-            <div class="fluxo-sub">
+            <h4 data-i18n="fluxo.fila.titulo">⏱️ Fila de priorização</h4>
+            <div class="fluxo-sub" data-i18n="fluxo.fila.sub">
               Ordem sugerida de atendimento: urgência atribuída pelo VigIA, depois score de
               confiabilidade e, por último, antiguidade — este critério evita que casos de
               baixa urgência fiquem indefinidamente sem atendimento.
@@ -851,23 +851,23 @@
             <div class="fluxo-meta" id="fila-meta"></div>
             <div id="fila-conteudo"></div>
             <div class="fluxo-acoes">
-              <button class="fluxo-btn primario" id="btn-atender" onclick="Fluxo.atenderProximo()">▶ Atender próximo</button>
-              <button class="fluxo-btn secundario" onclick="Fluxo.carregarFila()">Atualizar</button>
+              <button class="fluxo-btn primario" id="btn-atender" onclick="Fluxo.atenderProximo()" data-i18n="fluxo.fila.atender">▶ Atender próximo</button>
+              <button class="fluxo-btn secundario" onclick="Fluxo.carregarFila()" data-i18n="fluxo.atualizar">Atualizar</button>
             </div>
           </div>
 
           <div class="fluxo-card">
-            <h4>↩️ Ações reversíveis</h4>
-            <div class="fluxo-sub">
+            <h4 data-i18n="fluxo.pilha.titulo">↩️ Ações reversíveis</h4>
+            <div class="fluxo-sub" data-i18n="fluxo.pilha.sub">
               Histórico das suas mudanças de status, da mais recente para a mais antiga.
-              Desfazer <b>não apaga</b> o passo errado: acrescenta um evento novo restaurando
+              Desfazer não apaga o passo errado: acrescenta um evento novo restaurando
               o status anterior, preservando a rastreabilidade do caso.
             </div>
             <div class="fluxo-meta" id="pilha-meta"></div>
             <div id="pilha-conteudo"></div>
             <div class="fluxo-acoes">
-              <button class="fluxo-btn primario" id="btn-desfazer" onclick="Fluxo.desfazer()">↩ Desfazer última</button>
-              <button class="fluxo-btn secundario" onclick="Fluxo.carregarPilha()">Atualizar</button>
+              <button class="fluxo-btn primario" id="btn-desfazer" onclick="Fluxo.desfazer()" data-i18n="fluxo.pilha.desfazer">↩ Desfazer última</button>
+              <button class="fluxo-btn secundario" onclick="Fluxo.carregarPilha()" data-i18n="fluxo.atualizar">Atualizar</button>
             </div>
           </div>
 
@@ -881,16 +881,16 @@
         <div class="equipe-wrap">
           <div class="equipe-header">
             <div>
-              <h3>👥 Equipe</h3>
-              <div class="equipe-sub">Cadastre os membros que poderão ser responsáveis pelas denúncias. O cadastro é servido pela API — cadastrar e remover exigem perfil Gestor ou Administrador.</div>
+              <h3 data-i18n="equipe.titulo">👥 Equipe</h3>
+              <div class="equipe-sub" data-i18n="equipe.sub">Cadastre os membros que poderão ser responsáveis pelas denúncias. O cadastro é servido pela API — cadastrar e remover exigem perfil Gestor ou Administrador.</div>
             </div>
           </div>
 
           <div class="equipe-form">
-            <input type="text"  id="eq-nome"  placeholder="Nome do membro">
-            <input type="text"  id="eq-cargo" placeholder="Cargo (ex: Analista de denúncias)">
-            <input type="email" id="eq-email" placeholder="E-mail institucional">
-            <button class="btn btn-primary" onclick="Equipe.adicionar()">+ Adicionar</button>
+            <input type="text"  id="eq-nome"  placeholder="Nome do membro" data-i18n="equipe.nome_ph" data-i18n-prop="placeholder">
+            <input type="text"  id="eq-cargo" placeholder="Cargo (ex: Analista de denúncias)" data-i18n="equipe.cargo_ph" data-i18n-prop="placeholder">
+            <input type="email" id="eq-email" placeholder="E-mail institucional" data-i18n="equipe.email_ph" data-i18n-prop="placeholder">
+            <button class="btn btn-primary" onclick="Equipe.adicionar()" data-i18n="equipe.add">+ Adicionar</button>
           </div>
 
           <div class="equipe-lista" id="equipe-lista"></div>
@@ -901,8 +901,8 @@
       <div class="dashboard-content" id="tab-auditoria" style="display:none">
         <div class="kanban-header">
           <div>
-            <h3>🔎 Trilha de Auditoria</h3>
-            <div class="kanban-sub">
+            <h3 data-i18n="aud.titulo">🔎 Trilha de Auditoria</h3>
+            <div class="kanban-sub" data-i18n="aud.sub">
               Registro imutável das ações sensíveis, encadeado por SHA-256. Restrito aos perfis
               Auditor e Administrador — quem opera o sistema não fiscaliza o próprio uso dele.
               Tentativas recusadas também aparecem aqui.
@@ -912,29 +912,29 @@
 
         <div class="aud-barra">
           <div class="aud-campo">
-            <label for="aud-f-usuario">Usuário</label>
-            <input type="text" id="aud-f-usuario" placeholder="trecho do e-mail">
+            <label for="aud-f-usuario" data-i18n="aud.f.usuario">Usuário</label>
+            <input type="text" id="aud-f-usuario" placeholder="trecho do e-mail" data-i18n="aud.f.usuario_ph" data-i18n-prop="placeholder">
           </div>
           <div class="aud-campo">
-            <label for="aud-f-acao">Ação</label>
-            <select id="aud-f-acao"><option value="">todas</option></select>
+            <label for="aud-f-acao" data-i18n="aud.f.acao">Ação</label>
+            <select id="aud-f-acao"><option value="" data-i18n="aud.f.todas">todas</option></select>
           </div>
           <div class="aud-campo">
-            <label for="aud-f-inicio">De</label>
+            <label for="aud-f-inicio" data-i18n="aud.f.de">De</label>
             <input type="date" id="aud-f-inicio">
           </div>
           <div class="aud-campo">
-            <label for="aud-f-fim">Até</label>
+            <label for="aud-f-fim" data-i18n="aud.f.ate">Até</label>
             <input type="date" id="aud-f-fim">
           </div>
-          <button class="fluxo-btn primario" onclick="Auditoria.carregar(0)">Filtrar</button>
-          <button class="fluxo-btn secundario" onclick="Auditoria.limpar()">Limpar</button>
-          <button class="fluxo-btn secundario" onclick="Auditoria.verificarIntegridade()">🔐 Verificar integridade</button>
+          <button class="fluxo-btn primario" onclick="Auditoria.carregar(0)" data-i18n="aud.filtrar">Filtrar</button>
+          <button class="fluxo-btn secundario" onclick="Auditoria.limpar()" data-i18n="aud.limpar">Limpar</button>
+          <button class="fluxo-btn secundario" onclick="Auditoria.verificarIntegridade()" data-i18n="aud.verificar">🔐 Verificar integridade</button>
         </div>
 
-        <div class="aud-integridade" id="aud-integridade">
+        <div class="aud-integridade" id="aud-integridade" data-i18n="aud.integridade.dica">
           Cada registro guarda o hash do anterior. Alterar ou remover qualquer linha invalida
-          a cadeia — clique em <b>Verificar integridade</b> para recalcular tudo e ver se algum
+          a cadeia — clique em "Verificar integridade" para recalcular tudo e ver se algum
           elo foi rompido.
         </div>
 
@@ -942,8 +942,8 @@
           <table id="aud-table">
             <thead>
               <tr>
-                <th>Data e hora</th><th>Usuário</th><th>Ação</th>
-                <th>Recurso</th><th>Resultado</th><th>Origem</th><th>Encadeamento</th>
+                <th data-i18n="aud.th.datahora">Data e hora</th><th data-i18n="aud.th.usuario">Usuário</th><th data-i18n="aud.th.acao">Ação</th>
+                <th data-i18n="aud.th.recurso">Recurso</th><th data-i18n="aud.th.resultado">Resultado</th><th data-i18n="aud.th.origem">Origem</th><th data-i18n="aud.th.encadeamento">Encadeamento</th>
               </tr>
             </thead>
             <tbody id="aud-tbody"></tbody>
@@ -951,8 +951,8 @@
         </div>
 
         <div class="aud-paginacao">
-          <button class="fluxo-btn secundario" id="aud-ant"  onclick="Auditoria.anterior()">← Anterior</button>
-          <button class="fluxo-btn secundario" id="aud-prox" onclick="Auditoria.proxima()">Próxima →</button>
+          <button class="fluxo-btn secundario" id="aud-ant"  onclick="Auditoria.anterior()" data-i18n="aud.ant">← Anterior</button>
+          <button class="fluxo-btn secundario" id="aud-prox" onclick="Auditoria.proxima()" data-i18n="aud.prox">Próxima →</button>
           <span id="aud-info"></span>
         </div>
       </div>

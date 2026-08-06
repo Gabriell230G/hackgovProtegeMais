@@ -103,6 +103,69 @@ const I18n = (() => {
       'sc.protocolo':'Protocolo',
       'sc.aviso':'Esta ação será registrada no histórico da denúncia.',
       'sc.cancelar':'Cancelar','sc.confirmar':'Confirmar',
+      // -- Painel do servidor (sidebar e perfis) --
+      'painel.acessar_como':'Acessar como:',
+      'painel.perfil.admin':'🛡️ Admin','painel.perfil.gestor':'👔 Gestor',
+      'painel.perfil.atendente':'👁️ Atendente','painel.perfil.auditor':'🔎 Auditor',
+      'nav.resumo':'Resumo','nav.backlog':'Backlog Denúncias',
+      'nav.status_d':'Status das Denúncias','nav.kanban':'Kanban','nav.equipe':'Equipe',
+      'nav.auditoria':'Trilha de Auditoria',
+      // -- Indicador de origem dos dados (US22) --
+      'conexao.verificando':'verificando…','conexao.verificando_dica':'Consultando a API…',
+      'conexao.online':'API conectada',
+      'conexao.online_dica':'Os dados vêm do banco, pela API Java. Clique para verificar novamente.',
+      'conexao.offline':'modo local',
+      'conexao.offline_dica':'A API está fora do ar. Os dados exibidos vêm do armazenamento deste navegador.',
+      'conexao.dica':'Clique para verificar novamente',
+      // -- Chamada para a versão React do formulário --
+      'react.titulo':'Versão em React deste formulário',
+      'react.sub':'Mesmo cadastro, implementado como componente React consumindo a mesma API. Útil para comparar as duas abordagens de front-end.',
+      'react.abrir':'Abrir',
+      // -- Kanban --
+      'kanban.titulo':'🗂️ Kanban de Denúncias',
+      'kanban.sub':'Arraste um card entre as colunas para mudar o status. A mudança pede confirmação.',
+      // -- Fila de priorização e pilha de ações (US20 / US21) --
+      'fluxo.fila.titulo':'⏱️ Fila de priorização',
+      'fluxo.fila.sub':'Ordem sugerida de atendimento: urgência atribuída pelo VigIA, depois score de confiabilidade e, por último, antiguidade — este critério evita que casos de baixa urgência fiquem indefinidamente sem atendimento.',
+      'fluxo.fila.atender':'▶ Atender próximo','fluxo.fila.atendendo':'Atendendo…',
+      'fluxo.fila.carregando':'Carregando a fila…',
+      'fluxo.fila.erro':'Não foi possível consultar a fila.',
+      'fluxo.fila.offline':'A fila de priorização exige a API no ar. No modo local ela não está disponível.',
+      'fluxo.fila.vazia':'Nenhum caso aguardando atendimento.',
+      'fluxo.fila.aberto':'em aberto','fluxo.fila.mais_antigo':'mais antigo há','fluxo.fila.dias':'dia(s)',
+      'fluxo.assumido':'assumido para análise.',
+      'fluxo.pilha.titulo':'↩️ Ações reversíveis',
+      'fluxo.pilha.sub':'Histórico das suas mudanças de status, da mais recente para a mais antiga. Desfazer não apaga o passo errado: acrescenta um evento novo restaurando o status anterior, preservando a rastreabilidade do caso.',
+      'fluxo.pilha.desfazer':'↩ Desfazer última','fluxo.pilha.desfazendo':'Desfazendo…',
+      'fluxo.pilha.vazia':'Nenhuma ação recente para desfazer.',
+      'fluxo.pilha.topo':'topo','fluxo.pilha.de':'de',
+      'fluxo.pilha.voltou':'voltou para','fluxo.pilha.nota':'O histórico registra o retorno como evento novo.',
+      'fluxo.atualizar':'Atualizar','fluxo.score':'score',
+      'urg.critica':'Crítica','urg.alta':'Alta','urg.media':'Média','urg.baixa':'Baixa',
+      // -- Equipe --
+      'equipe.titulo':'👥 Equipe',
+      'equipe.sub':'Cadastre os membros que poderão ser responsáveis pelas denúncias. O cadastro é servido pela API — cadastrar e remover exigem perfil Gestor ou Administrador.',
+      'equipe.nome_ph':'Nome do membro','equipe.cargo_ph':'Cargo (ex: Analista de denúncias)',
+      'equipe.email_ph':'E-mail institucional','equipe.add':'+ Adicionar',
+      // -- Trilha de auditoria (US19 / US25) --
+      'aud.titulo':'🔎 Trilha de Auditoria',
+      'aud.sub':'Registro imutável das ações sensíveis, encadeado por SHA-256. Restrito aos perfis Auditor e Administrador — quem opera o sistema não fiscaliza o próprio uso dele. Tentativas recusadas também aparecem aqui.',
+      'aud.f.usuario':'Usuário','aud.f.usuario_ph':'trecho do e-mail',
+      'aud.f.acao':'Ação','aud.f.todas':'todas','aud.f.de':'De','aud.f.ate':'Até',
+      'aud.filtrar':'Filtrar','aud.limpar':'Limpar','aud.verificar':'🔐 Verificar integridade',
+      'aud.integridade.dica':'Cada registro guarda o hash do anterior. Alterar ou remover qualquer linha invalida a cadeia — clique em "Verificar integridade" para recalcular tudo e ver se algum elo foi rompido.',
+      'aud.th.datahora':'Data e hora','aud.th.usuario':'Usuário','aud.th.acao':'Ação',
+      'aud.th.recurso':'Recurso','aud.th.resultado':'Resultado','aud.th.origem':'Origem',
+      'aud.th.encadeamento':'Encadeamento',
+      'aud.ant':'← Anterior','aud.prox':'Próxima →',
+      'aud.carregando':'Carregando…','aud.vazio':'Nenhum registro de auditoria para os filtros selecionados.',
+      'aud.negado':'Acesso negado.','aud.negado_nota':'Esta tentativa foi registrada na própria trilha de auditoria.',
+      'aud.registros':'registro(s)','aud.pagina':'página','aud.de':'de',
+      'aud.recalculando':'Recalculando a cadeia de hashes…',
+      'aud.integra':'Cadeia íntegra.',
+      'aud.integra_sub':'registros foram recalculados e todos os elos conferem.',
+      'aud.rompida':'Cadeia rompida no registro',
+      'aud.hash_ant':'hash anterior','aud.hash':'hash',
     },
 
     en: {
@@ -201,6 +264,69 @@ const I18n = (() => {
       'sc.protocolo':'Protocol',
       'sc.aviso':'This action will be recorded in the report history.',
       'sc.cancelar':'Cancel','sc.confirmar':'Confirm',
+      // -- Staff dashboard (sidebar and profiles) --
+      'painel.acessar_como':'Sign in as:',
+      'painel.perfil.admin':'🛡️ Admin','painel.perfil.gestor':'👔 Manager',
+      'painel.perfil.atendente':'👁️ Agent','painel.perfil.auditor':'🔎 Auditor',
+      'nav.resumo':'Overview','nav.backlog':'Reports Backlog',
+      'nav.status_d':'Report Statuses','nav.kanban':'Kanban','nav.equipe':'Team',
+      'nav.auditoria':'Audit Trail',
+      // -- Data source indicator (US22) --
+      'conexao.verificando':'checking…','conexao.verificando_dica':'Querying the API…',
+      'conexao.online':'API connected',
+      'conexao.online_dica':'Data comes from the database through the Java API. Click to check again.',
+      'conexao.offline':'local mode',
+      'conexao.offline_dica':'The API is down. The data shown comes from this browser storage.',
+      'conexao.dica':'Click to check again',
+      // -- Link to the React version of the form --
+      'react.titulo':'React version of this form',
+      'react.sub':'Same submission form, built as a React component consuming the same API. Useful to compare both front-end approaches.',
+      'react.abrir':'Open',
+      // -- Kanban --
+      'kanban.titulo':'🗂️ Reports Kanban',
+      'kanban.sub':'Drag a card between columns to change its status. The change asks for confirmation.',
+      // -- Priority queue and action stack (US20 / US21) --
+      'fluxo.fila.titulo':'⏱️ Priority queue',
+      'fluxo.fila.sub':'Suggested handling order: urgency assigned by VigIA, then reliability score and finally age — this last criterion prevents low-urgency cases from waiting indefinitely.',
+      'fluxo.fila.atender':'▶ Take next case','fluxo.fila.atendendo':'Taking…',
+      'fluxo.fila.carregando':'Loading the queue…',
+      'fluxo.fila.erro':'Could not load the queue.',
+      'fluxo.fila.offline':'The priority queue requires the API to be running. It is not available in local mode.',
+      'fluxo.fila.vazia':'No case waiting to be handled.',
+      'fluxo.fila.aberto':'open','fluxo.fila.mais_antigo':'oldest waiting for','fluxo.fila.dias':'day(s)',
+      'fluxo.assumido':'assigned for review.',
+      'fluxo.pilha.titulo':'↩️ Reversible actions',
+      'fluxo.pilha.sub':'History of your status changes, most recent first. Undo does not erase the wrong step: it appends a new event restoring the previous status, preserving the traceability of the case.',
+      'fluxo.pilha.desfazer':'↩ Undo last','fluxo.pilha.desfazendo':'Undoing…',
+      'fluxo.pilha.vazia':'No recent action to undo.',
+      'fluxo.pilha.topo':'top','fluxo.pilha.de':'of',
+      'fluxo.pilha.voltou':'went back to','fluxo.pilha.nota':'The history records the rollback as a new event.',
+      'fluxo.atualizar':'Refresh','fluxo.score':'score',
+      'urg.critica':'Critical','urg.alta':'High','urg.media':'Medium','urg.baixa':'Low',
+      // -- Team --
+      'equipe.titulo':'👥 Team',
+      'equipe.sub':'Register the members who can be assigned to reports. The registry is served by the API — creating and removing require the Manager or Administrator profile.',
+      'equipe.nome_ph':'Member name','equipe.cargo_ph':'Role (e.g. Report analyst)',
+      'equipe.email_ph':'Institutional email','equipe.add':'+ Add',
+      // -- Audit trail (US19 / US25) --
+      'aud.titulo':'🔎 Audit Trail',
+      'aud.sub':'Immutable record of sensitive actions, chained with SHA-256. Restricted to the Auditor and Administrator profiles — whoever operates the system does not audit their own use of it. Denied attempts also show up here.',
+      'aud.f.usuario':'User','aud.f.usuario_ph':'part of the email',
+      'aud.f.acao':'Action','aud.f.todas':'all','aud.f.de':'From','aud.f.ate':'To',
+      'aud.filtrar':'Filter','aud.limpar':'Clear','aud.verificar':'🔐 Verify integrity',
+      'aud.integridade.dica':'Every record stores the hash of the previous one. Changing or removing any row invalidates the chain — click "Verify integrity" to recompute everything and see whether a link was broken.',
+      'aud.th.datahora':'Date and time','aud.th.usuario':'User','aud.th.acao':'Action',
+      'aud.th.recurso':'Resource','aud.th.resultado':'Result','aud.th.origem':'Origin',
+      'aud.th.encadeamento':'Chaining',
+      'aud.ant':'← Previous','aud.prox':'Next →',
+      'aud.carregando':'Loading…','aud.vazio':'No audit records for the selected filters.',
+      'aud.negado':'Access denied.','aud.negado_nota':'This attempt was itself recorded in the audit trail.',
+      'aud.registros':'record(s)','aud.pagina':'page','aud.de':'of',
+      'aud.recalculando':'Recomputing the hash chain…',
+      'aud.integra':'Chain intact.',
+      'aud.integra_sub':'records were recomputed and every link checks out.',
+      'aud.rompida':'Chain broken at record',
+      'aud.hash_ant':'previous hash','aud.hash':'hash',
     }
   };
 
@@ -222,6 +348,9 @@ const I18n = (() => {
     localStorage.setItem('idioma', idioma);
     aplicar();
     _atualizarBotao();
+    // Telas montadas por JavaScript (fila, pilha, auditoria) nao tem como ser
+    // reescritas por data-i18n: elas escutam este evento e se redesenham.
+    document.dispatchEvent(new CustomEvent('protege:idioma', { detail: { idioma } }));
   }
 
   function aplicar() {

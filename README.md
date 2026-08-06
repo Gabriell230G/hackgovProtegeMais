@@ -49,7 +49,11 @@ Sirva por HTTP — abrir o `index.html` com duplo clique faz o navegador bloquea
 python -m http.server 5500
 ```
 
-Acesse <http://localhost:5500>. O front detecta o backend sozinho: se a API estiver no ar, usa o banco; se não, cai para o `localStorage` (plano B automático). O console do navegador informa qual modo está ativo.
+Acesse <http://localhost:5500>. Use **duas janelas de terminal**: uma para o backend (`backend/`) e outra para o servidor de arquivos (raiz do projeto). Se as duas forem a mesma janela, subir o segundo comando derruba o primeiro.
+
+O front detecta o backend sozinho: se a API estiver no ar, usa o banco; se não, cai para o `localStorage` (plano B automático). O modo ativo não fica implícito — a **etiqueta de conexão** no alto da barra lateral do painel mostra `API conectada` ou `modo local`, e é clicável para verificar de novo. Quem decide olhando aquela tela precisa saber se os números vêm do banco ou só daquele navegador.
+
+Duas telas consomem a mesma API para efeito de comparação: `index.html` (JavaScript puro) e `formulario-react.html` (**React 18 via CDN**, sem etapa de build). O bloco *"Versão em React deste formulário"*, na seção de denúncia, leva de uma à outra.
 
 ### 3. IA (VigIA com Gemini) — opcional
 
@@ -114,8 +118,14 @@ O gestor **não** consulta a trilha de auditoria: quem opera o sistema não fisc
 | `PATCH` | `/api/denuncias/{id}/status` | 🔒 | Muda o status e registra na linha do tempo |
 | `PATCH` | `/api/denuncias/{id}/responsavel` | 🔒 | Atribui responsável |
 | `DELETE` | `/api/denuncias/{id}?motivo=` | GESTOR, ADMIN | Exclusão lógica com anonimização. Exige motivo |
-| `GET/POST/PUT/DELETE` | `/api/equipe` | 🔒 / GESTOR | Gestão da equipe |
+| `GET` | `/api/equipe` | 🔒 | Lista os membros que podem ser responsabilizados por um caso |
+| `GET` | `/api/equipe/{id}` | 🔒 | Detalhe de um membro |
+| `POST` | `/api/equipe` | GESTOR, ADMIN | Cadastra membro. `201` com `Location` |
+| `PUT` | `/api/equipe/{id}` | GESTOR, ADMIN | Atualiza membro |
+| `DELETE` | `/api/equipe/{id}` | GESTOR, ADMIN | Remove membro |
 | `GET` | `/api/stats` | 🔒 | Totais por status, tipo, urgência e UF |
+
+São **25 mapeamentos** no total. **12** deles estão anotados com `@Auditavel` e alimentam a trilha — inclusive as tentativas recusadas.
 
 ### Fluxo de atendimento — estruturas de dados
 
@@ -176,7 +186,9 @@ cd backend
 .\build.cmd clean test
 ```
 
-**24 testes** cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha e detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou.
+**24 testes** em 5 classes, cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha e detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou.
+
+Um dos testes existe por causa de um bug real: a data-hora era gravada com precisão de nanossegundo e relida truncada pelo banco, o que quebrava o hash de registros legítimos. O teste fixa o truncamento em milissegundos para que ninguém o remova sem perceber.
 
 ---
 
@@ -184,33 +196,47 @@ cd backend
 
 ```
 .
-├── index.html
-├── css/                    6 folhas de estilo
-├── js/                     20 módulos
-│   ├── backend.js          ponte com a API (JWT + fallback localStorage)
-│   ├── anonimato.js        anonimato graduado e elo de mão dupla
-│   ├── acesso.js           controle de acesso por papéis no painel
-│   ├── lgpd.js             cifragem de campo e painel de conformidade
-│   ├── mapa-gestor.js      mapa com k-anonimato
-│   └── ...
-├── database/               modelo físico Oracle
+├── index.html                  portal do cidadão + painel do servidor
+├── formulario-react.html       mesmo formulário em React 18 (CDN, sem build)
+├── search.html                 tela-disfarce do Modo Seguro
+├── css/                        7 folhas de estilo
+│   ├── style.css               base do portal
+│   ├── kanban.css              painel do servidor
+│   ├── painel-api.css          etiqueta de conexão, fila, pilha e auditoria
+│   └── anonimato · emergencia · lgpd · panico
+├── js/                         23 módulos
+│   ├── backend.js              ponte com a API (JWT + fallback localStorage)
+│   ├── conexao.js              etiqueta de origem dos dados: API ou local
+│   ├── fluxo.js                fila de priorização e pilha de desfazer
+│   ├── auditoria.js            consulta da trilha e verificação de integridade
+│   ├── acesso.js               troca de perfil com login real na API
+│   ├── equipe.js               equipe servida pela API, com cache em memória
+│   ├── anonimato.js            anonimato graduado e elo de mão dupla
+│   ├── i18n.js                 português e inglês, inclusive nas telas novas
+│   ├── lgpd.js                 cifragem de campo e painel de conformidade
+│   ├── mapa-gestor.js          mapa com k-anonimato
+│   └── ...                     vigia · kanban · emergencia · panico · chatbot …
+├── database/                   modelo físico Oracle
+│   ├── 01_ddl_oracle.sql
+│   ├── 02_dml_carga.sql
+│   └── 03_consultas.sql
 └── backend/
-    ├── build.cmd           bootstrap: baixa o Maven se necessário
+    ├── build.cmd / build.ps1   bootstrap: baixa o Maven se necessário
     ├── pom.xml
     └── src/
-        ├── main/java/br/gov/protege/
+        ├── main/java/br/gov/protege/      49 classes
         │   ├── audit/        @Auditavel e o interceptador da trilha
         │   ├── config/       OpenAPI
-        │   ├── controller/   endpoints e tratamento de erros
+        │   ├── controller/   7 controladores, 25 rotas, tratamento de erros
         │   ├── dto/          contratos de entrada e saída
         │   ├── exception/    exceções de domínio
         │   ├── mapper/       entidade → resposta, por perfil
         │   ├── model/        entidades JPA
         │   ├── repository/   Spring Data JPA
-        │   ├── security/     JWT, RBAC, CORS, limite por origem
+        │   ├── security/     JWT, RBAC, CORS, limite de requisições
         │   ├── service/      score, IA, fila, pilha e auditoria
         │   └── util/         mascaramento de dados pessoais
-        └── test/java/...     24 testes JUnit
+        └── test/java/...     5 classes, 24 testes JUnit
 ```
 
 ---

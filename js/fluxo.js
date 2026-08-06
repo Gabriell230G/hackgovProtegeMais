@@ -15,14 +15,24 @@
  * Desfazer NÃO reescreve a linha do tempo da denúncia: acrescenta um evento
  * novo restaurando o status anterior. Num sistema público, poder apagar a
  * própria pegada anularia a rastreabilidade.
+ *
+ * Todo texto visível sai do I18n (US14). Como estes painéis são montados por
+ * JavaScript, data-i18n não os alcança na troca de idioma: eles escutam o
+ * evento 'protege:idioma' e se redesenham.
  */
 const Fluxo = (() => {
 
+  // Fallback: se o i18n.js falhar, o painel continua em português em vez de
+  // exibir a chave crua na tela do gestor.
+  function T(chave, padrao) {
+    return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(chave) : padrao;
+  }
+
   const ROTULO_URGENCIA = {
-    CRITICA: { txt: 'Crítica', cor: '#DC2626' },
-    ALTA:    { txt: 'Alta',    cor: '#EA580C' },
-    MEDIA:   { txt: 'Média',   cor: '#D97706' },
-    BAIXA:   { txt: 'Baixa',   cor: '#0891B2' },
+    CRITICA: { chave: 'urg.critica', padrao: 'Crítica', cor: '#DC2626' },
+    ALTA:    { chave: 'urg.alta',    padrao: 'Alta',    cor: '#EA580C' },
+    MEDIA:   { chave: 'urg.media',   padrao: 'Média',   cor: '#D97706' },
+    BAIXA:   { chave: 'urg.baixa',   padrao: 'Baixa',   cor: '#0891B2' },
   };
 
   function aviso(msg) {
@@ -40,30 +50,30 @@ const Fluxo = (() => {
   async function carregarFila() {
     const alvo = document.getElementById('fila-conteudo');
     if (!alvo) return;
-    alvo.innerHTML = '<div class="fluxo-vazio">Carregando a fila…</div>';
+    alvo.innerHTML = `<div class="fluxo-vazio">${esc(T('fluxo.fila.carregando', 'Carregando a fila…'))}</div>`;
 
     let dados;
     try {
       dados = await Backend.consultarFila(8);
     } catch (e) {
-      alvo.innerHTML = `<div class="fluxo-vazio erro">Não foi possível consultar a fila. ${esc(e.message)}</div>`;
+      alvo.innerHTML = `<div class="fluxo-vazio erro">${esc(T('fluxo.fila.erro', 'Não foi possível consultar a fila.'))} ${esc(e.message)}</div>`;
       return;
     }
     if (!dados) {
-      alvo.innerHTML = '<div class="fluxo-vazio">A fila de priorização exige a API no ar. '
-                     + 'No modo local ela não está disponível.</div>';
+      alvo.innerHTML = `<div class="fluxo-vazio">${esc(T('fluxo.fila.offline',
+        'A fila de priorização exige a API no ar. No modo local ela não está disponível.'))}</div>`;
       return;
     }
 
     const meta = document.getElementById('fila-meta');
     if (meta) {
-      meta.innerHTML = `<span><b>${dados.totalNaFila}</b> em aberto</span>`
-        + `<span>mais antigo há <b>${dados.diasDeEsperaDoMaisAntigo}</b> dia(s)</span>`
+      meta.innerHTML = `<span><b>${dados.totalNaFila}</b> ${esc(T('fluxo.fila.aberto', 'em aberto'))}</span>`
+        + `<span>${esc(T('fluxo.fila.mais_antigo', 'mais antigo há'))} <b>${dados.diasDeEsperaDoMaisAntigo}</b> ${esc(T('fluxo.fila.dias', 'dia(s)'))}</span>`
         + `<span class="fluxo-estrutura">${esc(dados.estrutura)}</span>`;
     }
 
     if (!dados.proximos || dados.proximos.length === 0) {
-      alvo.innerHTML = '<div class="fluxo-vazio">Nenhum caso aguardando atendimento.</div>';
+      alvo.innerHTML = `<div class="fluxo-vazio">${esc(T('fluxo.fila.vazia', 'Nenhum caso aguardando atendimento.'))}</div>`;
       const btn = document.getElementById('btn-atender');
       if (btn) btn.disabled = true;
       return;
@@ -73,7 +83,9 @@ const Fluxo = (() => {
     if (btn) btn.disabled = false;
 
     alvo.innerHTML = dados.proximos.map((d, i) => {
-      const u = ROTULO_URGENCIA[d.urgenciaIa] || { txt: d.urgenciaIa || '—', cor: '#64748B' };
+      const r = ROTULO_URGENCIA[d.urgenciaIa];
+      const u = r ? { txt: T(r.chave, r.padrao), cor: r.cor }
+                  : { txt: d.urgenciaIa || '—', cor: '#64748B' };
       return `<div class="fila-item ${i === 0 ? 'topo' : ''}">
         <div class="fila-pos">${i + 1}º</div>
         <div class="fila-corpo">
@@ -83,7 +95,7 @@ const Fluxo = (() => {
           </div>
           <div class="fila-linha2">
             <span>${esc(d.tipo)}</span> · <span>${esc(d.local || '—')}</span>
-            · <span>score ${d.score}</span>
+            · <span>${esc(T('fluxo.score', 'score'))} ${d.score}</span>
           </div>
         </div>
       </div>`;
@@ -92,16 +104,16 @@ const Fluxo = (() => {
 
   async function atenderProximo() {
     const btn = document.getElementById('btn-atender');
-    if (btn) { btn.disabled = true; btn.textContent = 'Atendendo…'; }
+    if (btn) { btn.disabled = true; btn.textContent = T('fluxo.fila.atendendo', 'Atendendo…'); }
     try {
       const caso = await Backend.atenderProximo();
-      aviso(`✅ Caso ${caso.protocolo} assumido para análise.`);
+      aviso(`✅ ${caso.protocolo} ${T('fluxo.assumido', 'assumido para análise.')}`);
       await Promise.all([carregarFila(), carregarPilha()]);
       if (typeof Kanban !== 'undefined' && Kanban.render) Kanban.render();
     } catch (e) {
       aviso('❌ ' + e.message);
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '▶ Atender próximo'; }
+      if (btn) { btn.disabled = false; btn.textContent = T('fluxo.fila.atender', '▶ Atender próximo'); }
     }
   }
 
@@ -119,7 +131,7 @@ const Fluxo = (() => {
     const btn = document.getElementById('btn-desfazer');
 
     if (!dados || !dados.acoes || dados.acoes.length === 0) {
-      alvo.innerHTML = '<div class="fluxo-vazio">Nenhuma ação recente para desfazer.</div>';
+      alvo.innerHTML = `<div class="fluxo-vazio">${esc(T('fluxo.pilha.vazia', 'Nenhuma ação recente para desfazer.'))}</div>`;
       if (btn) btn.disabled = true;
       return;
     }
@@ -127,13 +139,13 @@ const Fluxo = (() => {
 
     const meta = document.getElementById('pilha-meta');
     if (meta) {
-      meta.innerHTML = `<span><b>${dados.tamanho}</b> de ${dados.profundidadeMaxima}</span>`
+      meta.innerHTML = `<span><b>${dados.tamanho}</b> ${esc(T('fluxo.pilha.de', 'de'))} ${dados.profundidadeMaxima}</span>`
         + `<span class="fluxo-estrutura">${esc(dados.estrutura)}</span>`;
     }
 
     alvo.innerHTML = dados.acoes.map((a, i) => `
       <div class="pilha-item ${i === 0 ? 'topo' : ''}">
-        ${i === 0 ? '<span class="pilha-tag">topo</span>' : ''}
+        ${i === 0 ? `<span class="pilha-tag">${esc(T('fluxo.pilha.topo', 'topo'))}</span>` : ''}
         <div class="pilha-desc">${esc(a.descricao)}</div>
         <div class="pilha-hora">${esc((a.quando || '').replace('T', ' ').slice(0, 16))}</div>
       </div>`).join('');
@@ -141,22 +153,30 @@ const Fluxo = (() => {
 
   async function desfazer() {
     const btn = document.getElementById('btn-desfazer');
-    if (btn) { btn.disabled = true; btn.textContent = 'Desfazendo…'; }
+    if (btn) { btn.disabled = true; btn.textContent = T('fluxo.pilha.desfazendo', 'Desfazendo…'); }
     try {
       const caso = await Backend.desfazerUltima();
-      aviso(`↩️ ${caso.protocolo} voltou para "${caso.status}". O histórico registra o retorno como evento novo.`);
+      aviso(`↩️ ${caso.protocolo} ${T('fluxo.pilha.voltou', 'voltou para')} "${caso.status}". `
+          + T('fluxo.pilha.nota', 'O histórico registra o retorno como evento novo.'));
       await Promise.all([carregarFila(), carregarPilha()]);
       if (typeof Kanban !== 'undefined' && Kanban.render) Kanban.render();
     } catch (e) {
       aviso('❌ ' + e.message);
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = '↩ Desfazer última'; }
+      if (btn) { btn.disabled = false; btn.textContent = T('fluxo.pilha.desfazer', '↩ Desfazer última'); }
     }
   }
 
   async function atualizar() {
     await Promise.all([carregarFila(), carregarPilha()]);
   }
+
+  // Redesenha na troca de idioma, mas so se o painel estiver na tela:
+  // recarregar a fila com a aba fechada seria uma chamada de API desperdicada.
+  document.addEventListener('protege:idioma', () => {
+    const painel = document.getElementById('tab-kanban');
+    if (painel && painel.style.display !== 'none') atualizar();
+  });
 
   return { atualizar, carregarFila, carregarPilha, atenderProximo, desfazer };
 })();

@@ -10,8 +10,15 @@
  * o primeiro elo rompido, distinguindo conteúdo alterado de registro
  * removido ou inserido. Não impede adulteração: impede que ela passe
  * despercebida.
+ *
+ * A tabela é montada por JavaScript, então data-i18n não a alcança: o módulo
+ * escuta 'protege:idioma' e recarrega a página corrente (US14).
  */
 const Auditoria = (() => {
+
+  function T(chave, padrao) {
+    return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(chave) : padrao;
+  }
 
   const COR_ACAO = {
     LOGIN: '#16A34A', LOGIN_NEGADO: '#DC2626',
@@ -49,7 +56,7 @@ const Auditoria = (() => {
     const info = document.getElementById('aud-info');
     if (!corpo) return;
 
-    corpo.innerHTML = '<tr><td colspan="7" class="aud-vazio">Carregando…</td></tr>';
+    corpo.innerHTML = `<tr><td colspan="7" class="aud-vazio">${esc(T('aud.carregando', 'Carregando…'))}</td></tr>`;
 
     let page;
     try {
@@ -57,15 +64,17 @@ const Auditoria = (() => {
     } catch (e) {
       const negado = e.status === 403;
       corpo.innerHTML = `<tr><td colspan="7" class="aud-vazio ${negado ? 'negado' : 'erro'}">
-        ${negado ? '🚫 <b>Acesso negado.</b> ' : '❌ '}${esc(e.message)}
-        ${negado ? '<br><span class="aud-nota">Esta tentativa foi registrada na própria trilha de auditoria.</span>' : ''}
+        ${negado ? '🚫 <b>' + esc(T('aud.negado', 'Acesso negado.')) + '</b> ' : '❌ '}${esc(e.message)}
+        ${negado ? '<br><span class="aud-nota">' + esc(T('aud.negado_nota',
+            'Esta tentativa foi registrada na própria trilha de auditoria.')) + '</span>' : ''}
       </td></tr>`;
       if (info) info.textContent = '';
       return;
     }
 
     if (info) {
-      info.textContent = `${page.totalItens} registro(s) · página ${page.pagina + 1} de ${Math.max(page.totalPaginas, 1)}`;
+      info.textContent = `${page.totalItens} ${T('aud.registros', 'registro(s)')} · `
+        + `${T('aud.pagina', 'página')} ${page.pagina + 1} ${T('aud.de', 'de')} ${Math.max(page.totalPaginas, 1)}`;
     }
     const ant = document.getElementById('aud-ant');
     const prox = document.getElementById('aud-prox');
@@ -73,9 +82,13 @@ const Auditoria = (() => {
     if (prox) prox.disabled = !page.temProxima;
 
     if (!page.conteudo.length) {
-      corpo.innerHTML = '<tr><td colspan="7" class="aud-vazio">Nenhum registro de auditoria para os filtros selecionados.</td></tr>';
+      corpo.innerHTML = `<tr><td colspan="7" class="aud-vazio">${esc(T('aud.vazio',
+        'Nenhum registro de auditoria para os filtros selecionados.'))}</td></tr>`;
       return;
     }
+
+    const rotuloAnterior = T('aud.hash_ant', 'hash anterior');
+    const rotuloHash = T('aud.hash', 'hash');
 
     corpo.innerHTML = page.conteudo.map(a => {
       const cor = COR_ACAO[a.acao] || '#64748B';
@@ -87,7 +100,7 @@ const Auditoria = (() => {
         <td>${esc(a.recurso || '—')}${a.recursoId ? ' <b>#' + esc(a.recursoId) + '</b>' : ''}</td>
         <td><span class="aud-result ${negado ? 'neg' : 'ok'}">${esc(a.resultado)}</span></td>
         <td class="aud-ip">${esc(a.origemIp || '—')}</td>
-        <td class="aud-hash" title="hash anterior: ${esc(a.hashAnterior)}&#10;hash: ${esc(a.hash)}">
+        <td class="aud-hash" title="${esc(rotuloAnterior)}: ${esc(a.hashAnterior)}&#10;${esc(rotuloHash)}: ${esc(a.hash)}">
           ${esc((a.hashAnterior || '').slice(0, 8))} → ${esc((a.hash || '').slice(0, 8))}
         </td>
       </tr>`;
@@ -97,17 +110,20 @@ const Auditoria = (() => {
   async function verificarIntegridade() {
     const painel = document.getElementById('aud-integridade');
     if (!painel) return;
+    // Sai do controle do data-i18n: a partir daqui o texto e o resultado da
+    // verificacao, nao o aviso estatico da tela.
+    painel.removeAttribute('data-i18n');
     painel.className = 'aud-integridade verificando';
-    painel.innerHTML = 'Recalculando a cadeia de hashes…';
+    painel.innerHTML = esc(T('aud.recalculando', 'Recalculando a cadeia de hashes…'));
     try {
       const r = await Backend.verificarIntegridade();
       if (r.integra) {
         painel.className = 'aud-integridade ok';
-        painel.innerHTML = `✅ <b>Cadeia íntegra.</b> Os ${r.totalDeRegistros} registros foram
-          recalculados e todos os elos conferem.`;
+        painel.innerHTML = `✅ <b>${esc(T('aud.integra', 'Cadeia íntegra.'))}</b> ${r.totalDeRegistros} `
+          + esc(T('aud.integra_sub', 'registros foram recalculados e todos os elos conferem.'));
       } else {
         painel.className = 'aud-integridade falha';
-        painel.innerHTML = `🚨 <b>Cadeia rompida no registro #${r.rompidoNoRegistro}.</b> ${esc(r.motivo)}`;
+        painel.innerHTML = `🚨 <b>${esc(T('aud.rompida', 'Cadeia rompida no registro'))} #${esc(r.rompidoNoRegistro)}.</b> ${esc(r.motivo)}`;
       }
     } catch (e) {
       painel.className = 'aud-integridade falha';
@@ -141,6 +157,11 @@ const Auditoria = (() => {
     await popularAcoes();
     await carregar(0);
   }
+
+  document.addEventListener('protege:idioma', () => {
+    const painel = document.getElementById('tab-auditoria');
+    if (painel && painel.style.display !== 'none') carregar(pagina);
+  });
 
   return {
     abrir, carregar, limpar, verificarIntegridade,

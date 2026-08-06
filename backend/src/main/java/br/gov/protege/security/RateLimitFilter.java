@@ -36,8 +36,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final long JANELA_MS = 60_000L;
+    // Denuncia e mais restrita de proposito: o custo de uma denuncia falsa em
+    // massa recai sobre a equipe de atendimento, nao sobre o servidor.
     private static final int LIMITE_DENUNCIA = 5;    // por minuto, por IP
-    private static final int LIMITE_LOGIN    = 10;   // por minuto, por IP
+
+    // O login e mais folgado porque a chave e o IP, nao o usuario: varios
+    // servidores atras do mesmo NAT corporativo compartilham um unico endereco.
+    // Um limite apertado ali barraria uma reparticao inteira por causa de
+    // uma pessoa que errou a senha. Forca bruta continua contida: 20/min por IP
+    // sao 28.800 tentativas por dia contra hashes BCrypt.
+    private static final int LIMITE_LOGIN    = 20;   // por minuto, por IP
 
     private final Map<String, Deque<Long>> historico = new ConcurrentHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();

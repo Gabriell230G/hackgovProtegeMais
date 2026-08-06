@@ -8,10 +8,20 @@
  *
  * O indicador escuta o evento 'protege:conexao', disparado pelo backend.js
  * quando o health check da API é concluído.
+ *
+ * Os rótulos passam pelo I18n (US14). Em vez de reescrever o texto a cada
+ * troca de idioma, o elemento carrega a chave em data-i18n: quem redesenha
+ * é o próprio I18n.aplicar(), que já varre a página inteira.
  */
 const Conexao = (() => {
 
   let elemento = null;
+  let estado = null;   // null = verificando, true = online, false = offline
+
+  // Fallback para o caso de o i18n.js nao ter carregado: o painel continua legivel.
+  function T(chave, padrao) {
+    return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(chave) : padrao;
+  }
 
   function montar() {
     if (elemento) return elemento;
@@ -19,8 +29,7 @@ const Conexao = (() => {
     elemento.id = 'conexao-badge';
     elemento.className = 'conexao-badge verificando';
     elemento.type = 'button';
-    elemento.title = 'Clique para verificar novamente';
-    elemento.innerHTML = '<span class="conexao-ponto"></span><span class="conexao-txt">verificando…</span>';
+    elemento.innerHTML = '<span class="conexao-ponto"></span><span class="conexao-txt"></span>';
     elemento.addEventListener('click', () => {
       pintar(null);
       Backend.reavaliarConexao();
@@ -28,33 +37,40 @@ const Conexao = (() => {
     return elemento;
   }
 
+  const ESTILO = {
+    'null':  { classe: 'verificando', txt: ['conexao.verificando', 'verificando…'],  dica: ['conexao.verificando_dica', 'Consultando a API…'] },
+    'true':  { classe: 'online',      txt: ['conexao.online', 'API conectada'],      dica: ['conexao.online_dica', 'Os dados vêm do banco, pela API Java.'] },
+    'false': { classe: 'offline',     txt: ['conexao.offline', 'modo local'],        dica: ['conexao.offline_dica', 'A API está fora do ar. Os dados vêm deste navegador.'] },
+  };
+
   function pintar(online) {
     if (!elemento) return;
+    estado = online;
+    const e = ESTILO[String(online)];
     const txt = elemento.querySelector('.conexao-txt');
+
     elemento.classList.remove('online', 'offline', 'verificando');
-    if (online === null) {
-      elemento.classList.add('verificando');
-      txt.textContent = 'verificando…';
-      elemento.title = 'Consultando a API…';
-    } else if (online) {
-      elemento.classList.add('online');
-      txt.textContent = 'API conectada';
-      elemento.title = 'Os dados vêm do banco, pela API Java. Clique para verificar novamente.';
-    } else {
-      elemento.classList.add('offline');
-      txt.textContent = 'modo local';
-      elemento.title = 'A API está fora do ar. Os dados exibidos vêm do armazenamento deste navegador.';
-    }
+    elemento.classList.add(e.classe);
+
+    // Chave no atributo => a proxima troca de idioma reescreve sozinha.
+    txt.setAttribute('data-i18n', e.txt[0]);
+    txt.textContent = T(e.txt[0], e.txt[1]);
+
+    elemento.setAttribute('data-i18n', e.dica[0]);
+    elemento.setAttribute('data-i18n-prop', 'title');
+    elemento.title = T(e.dica[0], e.dica[1]);
   }
 
   function instalar(container) {
     const alvo = typeof container === 'string' ? document.getElementById(container) : container;
     if (!alvo) return;
     alvo.appendChild(montar());
+    pintar(null);
     if (typeof Backend !== 'undefined') Backend.estaOnline().then(pintar);
   }
 
   document.addEventListener('protege:conexao', e => pintar(e.detail.online));
+  document.addEventListener('protege:idioma', () => pintar(estado));
 
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => instalar('sidebar-conexao'), 150);
