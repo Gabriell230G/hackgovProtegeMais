@@ -91,19 +91,35 @@ const Sincronia = (() => {
     if (typeof Backend === 'undefined') return false;
     if (!forcar && Date.now() - ultimaCarga < 3000) return daApi;
 
-    let pagina;
+    // A API limita a pagina a 100 itens - e faz bem: pagina sem teto e um
+    // pedido de negacao de servico escrito na propria rota. Quem precisa da
+    // base inteira pagina, e e isso que este laco faz.
+    const TAMANHO = 100;
+    const MAX_PAGINAS = 50;   // teto de seguranca: 5.000 casos
+    const bruto = [];
     try {
       if (!(await Backend.estaOnline())) { daApi = false; return false; }
-      pagina = await Backend.listarPagina({ pagina: 0, tamanho: 500 });
+      let n = 0;
+      while (n < MAX_PAGINAS) {
+        const pagina = await Backend.listarPagina({ pagina: n, tamanho: TAMANHO });
+        if (!pagina || !Array.isArray(pagina.conteudo)) break;
+        bruto.push(...pagina.conteudo);
+        if (!pagina.temProxima) break;
+        n++;
+      }
+      if (n >= MAX_PAGINAS) {
+        console.warn('[Sincronia] teto de paginas atingido: a tela mostra os primeiros '
+                   + bruto.length + ' casos.');
+      }
     } catch (e) {
       // Sem token ainda (o gestor nao entrou) ou API caiu no meio: mantem a
       // tela como esta em vez de esvazia-la.
       daApi = false;
       return false;
     }
-    if (!pagina || !Array.isArray(pagina.conteudo)) { daApi = false; return false; }
+    if (!bruto.length) { daApi = false; return false; }
 
-    const lista = pagina.conteudo.map(paraTela);
+    const lista = bruto.map(paraTela);
     window.denuncias = lista;
     try { localStorage.setItem('denuncias', JSON.stringify(lista)); } catch (_) {}
 

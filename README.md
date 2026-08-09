@@ -16,7 +16,7 @@ Você precisa apenas de um **JDK 17 ou superior**. O Maven é baixado automatica
 
 ```bash
 cd backend
-.\build.cmd clean test     # Windows — roda os 49 testes
+.\build.cmd clean test     # Windows — roda os 81 testes
 .\build.cmd run            # sobe a API em http://localhost:8080
 ```
 
@@ -126,7 +126,19 @@ O gestor **não** consulta a trilha de auditoria: quem opera o sistema não fisc
 | `GET` | `/api/stats` | 🔒 | Totais por status, tipo, urgência e UF |
 | `GET` | `/api/stats/analitico` | 🔒 | Relatório estatístico completo: medidas de posição e dispersão, quartis, outliers, assimetria, correlação e recortes por tipo, urgência e anonimato |
 
-São **26 mapeamentos** no total. **12** deles estão anotados com `@Auditavel` e alimentam a trilha — inclusive as tentativas recusadas.
+### Evidências e exportação
+
+| Método | Rota | Perfil | Descrição |
+|---|---|---|---|
+| `POST` | `/api/denuncias/protocolo/{p}/evidencias` | público | Anexa arquivo (`multipart`). **201** · **413** acima de 5 MB · **415** formato recusado · **429** limite por origem |
+| `GET` | `/api/denuncias/{id}/evidencias` | 🔒 | Metadados dos anexos. Nunca o binário |
+| `GET` | `/api/evidencias/{id}/arquivo` | 🔒 | Baixa o arquivo. **Consulta sensível: gera auditoria** |
+| `DELETE` | `/api/evidencias/{id}?motivo=` | GESTOR, ADMIN | Remove o binário, mantém o registro. **204** |
+| `GET` | `/api/exportacao/denuncias` | GESTOR, ADMIN | CSV auditado, sem o relato, com o mascaramento do perfil |
+
+São **31 mapeamentos** no total. **15** deles estão anotados com `@Auditavel` e alimentam a trilha — inclusive as tentativas recusadas.
+
+**O tipo de um arquivo enviado é determinado pela assinatura do conteúdo**, e não pela extensão nem pelo cabeçalho `Content-Type` — os dois são escolhidos por quem envia. Um executável renomeado para `foto.jpg` é recusado com 415. O nome informado pelo usuário nunca chega ao disco: o arquivo recebe um UUID sem extensão, fora da pasta servida pelo servidor web.
 
 `/api/stats/analitico` deliberadamente **não** gera registro de auditoria: a resposta é integralmente agregada, nenhum campo permite chegar a um caso individual, e auditar leitura de agregado só encheria a trilha de ruído — dificultando justamente encontrar os acessos que importam.
 
@@ -193,7 +205,7 @@ cd backend
 .\build.cmd clean test
 ```
 
-**49 testes** em 7 classes, cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha, detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou — e toda a estatística descritiva do relatório.
+**81 testes** em 10 classes, cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha, detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou — toda a estatística descritiva do relatório, a detecção de tipo de arquivo pela assinatura, a higienização de nomes contra *path traversal* e a neutralização de injeção de fórmula em CSV.
 
 Os valores esperados nos testes de estatística foram calculados à mão e estão documentados no cabeçalho de cada classe. Um teste que confere o programa contra a saída do próprio programa passa a fingir que a conta está certa exatamente quando ela deixa de estar.
 
@@ -213,12 +225,14 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
 │   ├── kanban.css              painel do servidor
 │   ├── painel-api.css          etiqueta de conexão, fila, pilha e auditoria
 │   └── anonimato · emergencia · lgpd · panico
-├── js/                         24 módulos
+├── js/                         26 módulos
 │   ├── backend.js              ponte com a API (JWT + fallback localStorage)
 │   ├── conexao.js              etiqueta de origem dos dados: API ou local
 │   ├── fluxo.js                fila de priorização e pilha de desfazer
 │   ├── auditoria.js            consulta da trilha e verificação de integridade
 │   ├── estatistica.js          relatório estatístico com gráficos e leitura de cada um
+│   ├── sincronia.js            traz o portal e o painel para o banco
+│   ├── evidencias.js           anexos: listar, baixar e remover
 │   ├── acesso.js               troca de perfil com login real na API
 │   ├── equipe.js               equipe servida pela API, com cache em memória
 │   ├── anonimato.js            anonimato graduado e elo de mão dupla
@@ -226,6 +240,8 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
 │   ├── lgpd.js                 cifragem de campo e painel de conformidade
 │   ├── mapa-gestor.js          mapa com k-anonimato
 │   └── ...                     vigia · kanban · emergencia · panico · chatbot …
+├── wireframes/                 12 telas desenhadas na Fase 3, com LEIA-ME
+├── diagramas/                  modelo lógico e físico
 ├── database/                   modelo físico Oracle
 │   ├── 01_ddl_oracle.sql
 │   ├── 02_dml_carga.sql
@@ -234,10 +250,10 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
     ├── build.cmd / build.ps1   bootstrap: baixa o Maven se necessário
     ├── pom.xml
     └── src/
-        ├── main/java/br/gov/protege/      52 classes
+        ├── main/java/br/gov/protege/      61 classes
         │   ├── audit/        @Auditavel e o interceptador da trilha
         │   ├── config/       OpenAPI
-        │   ├── controller/   7 controladores, 26 rotas, tratamento de erros
+        │   ├── controller/   9 controladores, 31 rotas, tratamento de erros
         │   ├── dto/          contratos de entrada e saída
         │   ├── exception/    exceções de domínio
         │   ├── mapper/       entidade → resposta, por perfil
@@ -245,13 +261,13 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
         │   ├── repository/   Spring Data JPA
         │   ├── security/     JWT, RBAC, CORS, limite de requisições
         │   ├── service/      score, IA, fila, pilha, auditoria e estatística
-        │   └── util/         mascaramento de dados pessoais
-        └── test/java/...     7 classes, 49 testes JUnit
+        │   └── util/         mascaramento, assinatura de arquivo e nomes seguros
+        └── test/java/...     10 classes, 81 testes JUnit
 ```
 
 ---
 
 ## Links
 
-- 🎥 **Vídeo do pitch:** _(a inserir)_
+- 🎥 **Vídeo do pitch:** _(a inserir — o mesmo link deve ir para o botão em `index.html`, seção "Conheça o Protege+", e para os slides)_
 - 💻 **Repositório:** <https://github.com/Gabriell230G/hackgovProtegeMais>

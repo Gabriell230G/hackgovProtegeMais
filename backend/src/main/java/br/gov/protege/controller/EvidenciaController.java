@@ -64,7 +64,9 @@ public class EvidenciaController {
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Arquivo anexado"),
         @ApiResponse(responseCode = "404", description = "Protocolo inexistente"),
-        @ApiResponse(responseCode = "422", description = "Formato recusado, arquivo vazio, acima do limite ou caso ja concluido"),
+        @ApiResponse(responseCode = "413", description = "Arquivo acima de 5 MB"),
+        @ApiResponse(responseCode = "415", description = "Formato recusado pela assinatura do conteudo"),
+        @ApiResponse(responseCode = "422", description = "Arquivo vazio, limite de 10 anexos atingido ou caso ja concluido"),
         @ApiResponse(responseCode = "429", description = "Limite de envios por origem excedido")
     })
     @PostMapping(value = "/api/denuncias/protocolo/{protocolo}/evidencias",

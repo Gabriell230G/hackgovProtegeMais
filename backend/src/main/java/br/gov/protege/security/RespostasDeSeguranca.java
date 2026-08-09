@@ -1,5 +1,6 @@
 package br.gov.protege.security;
 
+import br.gov.protege.service.AuditoriaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,11 +30,24 @@ import java.util.Map;
  * que o cliente tenha um unico contrato de erro em toda a API. Nenhuma
  * delas informa se o recurso existe - isso permitiria mapear a base por
  * tentativa e erro.
+ *
+ * O 403 GRAVA AUDITORIA, e essa e a parte menos obvia desta classe.
+ * O interceptador @Auditavel roda em torno do METODO do controlador; quando
+ * a recusa acontece na regra de ROTA do SecurityConfig, o metodo nunca e
+ * chamado e o aspecto nunca dispara. Sem o registro aqui, exatamente as
+ * rotas mais protegidas - auditoria e exportacao - seriam as unicas cujas
+ * tentativas recusadas nao deixariam rastro. Um sistema que so registra o
+ * que deu certo nao serve para investigar abuso.
  */
 @Component
 public class RespostasDeSeguranca implements AuthenticationEntryPoint, AccessDeniedHandler {
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final AuditoriaService auditoria;
+
+    public RespostasDeSeguranca(AuditoriaService auditoria) {
+        this.auditoria = auditoria;
+    }
 
     /** Requisicao sem token, com token invalido ou expirado. */
     @Override
@@ -49,7 +63,39 @@ public class RespostasDeSeguranca implements AuthenticationEntryPoint, AccessDen
     public void handle(HttpServletRequest req, HttpServletResponse res,
                        org.springframework.security.access.AccessDeniedException ex)
             throws IOException {
+        registrarRecusa(req);
         escrever(res, HttpStatus.FORBIDDEN, "Acesso negado para o seu perfil.");
+    }
+
+    /**
+     * Deduz do caminho qual acao foi tentada e grava a recusa.
+     *
+     * A falha ao auditar NUNCA pode virar erro para o cliente: a resposta
+     * 403 e a decisao de seguranca, e ela precisa sair mesmo que o registro
+     * falhe. Por isso a excecao e engolida aqui - e a unica vez no sistema
+     * em que isso e aceitavel.
+     */
+    private void registrarRecusa(HttpServletRequest req) {
+        try {
+            String uri = req.getRequestURI();
+            String acao;
+            String recurso;
+            if (uri.startsWith("/api/auditoria")) {
+                acao = AuditoriaService.ACESSO_AUDITORIA; recurso = "AuditoriaLog";
+            } else if (uri.startsWith("/api/exportacao")) {
+                acao = AuditoriaService.EXPORTACAO; recurso = "Denuncia";
+            } else if (uri.startsWith("/api/equipe")) {
+                acao = AuditoriaService.ALTERACAO_EQUIPE; recurso = "Membro";
+            } else if (uri.startsWith("/api/evidencias")) {
+                acao = AuditoriaService.EXCLUSAO; recurso = "Evidencia";
+            } else {
+                acao = AuditoriaService.EXCLUSAO; recurso = "Denuncia";
+            }
+            auditoria.registrar(acao, recurso, null, AuditoriaService.NEGADO,
+                    "Recusado pela regra de rota: " + req.getMethod() + " " + uri);
+        } catch (RuntimeException e) {
+            // Auditar e importante; negar o acesso e mais.
+        }
     }
 
     private void escrever(HttpServletResponse res, HttpStatus status, String mensagem)

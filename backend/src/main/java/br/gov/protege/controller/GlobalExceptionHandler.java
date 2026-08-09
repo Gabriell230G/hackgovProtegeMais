@@ -1,6 +1,8 @@
 package br.gov.protege.controller;
 
+import br.gov.protege.exception.ArquivoGrandeDemaisException;
 import br.gov.protege.exception.ConflitoException;
+import br.gov.protege.exception.FormatoNaoSuportadoException;
 import br.gov.protege.exception.RecursoNaoEncontradoException;
 import br.gov.protege.exception.RegraDeNegocioException;
 import jakarta.validation.ConstraintViolationException;
@@ -73,6 +75,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflitoException.class)
     public ResponseEntity<Map<String, Object>> conflito(ConflitoException ex) {
         return build(HttpStatus.CONFLICT, ex.getMessage(), null, null);
+    }
+
+    /**
+     * Arquivo acima do limite -> 413.
+     *
+     * Cobre tambem a excecao do proprio Spring, lancada quando o upload
+     * estoura o teto do container antes de chegar a regra de negocio. Sem
+     * este tratamento o cliente receberia um 500 generico para uma situacao
+     * completamente previsivel.
+     */
+    @ExceptionHandler({ArquivoGrandeDemaisException.class,
+                       org.springframework.web.multipart.MaxUploadSizeExceededException.class})
+    public ResponseEntity<Map<String, Object>> arquivoGrande(Exception ex) {
+        return build(HttpStatus.PAYLOAD_TOO_LARGE,
+                "Arquivo acima do limite de 5 MB", null, null);
+    }
+
+    /** Formato recusado pela assinatura do conteudo -> 415. */
+    @ExceptionHandler(FormatoNaoSuportadoException.class)
+    public ResponseEntity<Map<String, Object>> formatoNaoSuportado(FormatoNaoSuportadoException ex) {
+        return build(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getMessage(), null, null);
     }
 
     /** Requisicao bem formada que viola regra de dominio -> 422. */

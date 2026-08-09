@@ -1,5 +1,7 @@
 package br.gov.protege.service;
 
+import br.gov.protege.exception.ArquivoGrandeDemaisException;
+import br.gov.protege.exception.FormatoNaoSuportadoException;
 import br.gov.protege.exception.RecursoNaoEncontradoException;
 import br.gov.protege.exception.RegraDeNegocioException;
 import br.gov.protege.model.Evidencia;
@@ -70,7 +72,7 @@ public class EvidenciaService {
             throw new RegraDeNegocioException("Arquivo vazio");
         }
         if (conteudo.length > TAMANHO_MAXIMO) {
-            throw new RegraDeNegocioException(
+            throw new ArquivoGrandeDemaisException(
                     "Arquivo acima do limite de " + (TAMANHO_MAXIMO / 1024 / 1024) + " MB");
         }
         if (repo.countByDenunciaIdAndRemovidaFalse(denunciaId) >= MAXIMO_POR_DENUNCIA) {
@@ -81,7 +83,7 @@ public class EvidenciaService {
         // O tipo vem do CONTEUDO. O que o cliente declarou e ignorado.
         String tipo = AssinaturaArquivo.detectar(conteudo);
         if (!AssinaturaArquivo.aceito(tipo)) {
-            throw new RegraDeNegocioException(
+            throw new FormatoNaoSuportadoException(
                     "Formato nao aceito. Envie: " + AssinaturaArquivo.formatosAceitos());
         }
 

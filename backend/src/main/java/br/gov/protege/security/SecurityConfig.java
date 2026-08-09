@@ -77,9 +77,22 @@ public class SecurityConfig {
                 // ---- EXPORTACAO DE DADOS ----
                 // A operacao de maior exposicao do sistema: entrega centenas de
                 // registros de uma vez, num arquivo que passa a circular fora
-                // de qualquer controle de acesso.
+                // de qualquer controle de acesso. Sempre auditada.
+                //
+                // O ATENDENTE exporta, e isso e deliberado: o arquivo carrega
+                // exatamente os campos que ele JA VE na tela do backlog, com o
+                // mesmo mascaramento de endereco. Liberar a tela e negar o CSV
+                // seria teatro - bastaria copiar a tabela a mao. O que protege
+                // aqui nao e a proibicao, e o mascaramento no servidor mais o
+                // registro de quem exportou e quando.
+                //
+                // O AUDITOR fica de fora: ele fiscaliza o uso do sistema, e nao
+                // trabalha os casos. Dar-lhe a base inteira seria criar o unico
+                // perfil com visao total, que e o que a segregacao evita.
                 .requestMatchers("/api/exportacao/**")
-                    .hasAnyRole(PerfilUsuario.GESTOR.name(), PerfilUsuario.ADMIN.name())
+                    .hasAnyRole(PerfilUsuario.ATENDENTE.name(),
+                                PerfilUsuario.GESTOR.name(),
+                                PerfilUsuario.ADMIN.name())
 
                 // ---- EXCLUSAO DE DENUNCIA E DE ANEXO ----
                 .requestMatchers(HttpMethod.DELETE, "/api/denuncias/**")
@@ -135,7 +148,10 @@ public class SecurityConfig {
                 .toList());
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
-        c.setExposedHeaders(List.of("Location"));
+        // Sem expor Content-Disposition, o JavaScript nao consegue ler o nome
+        // que o servidor sugeriu para o arquivo baixado - o navegador recebe
+        // o cabecalho, mas a origem cruzada o esconde do script.
+        c.setExposedHeaders(List.of("Location", "Content-Disposition"));
         c.setAllowCredentials(true);
         c.setMaxAge(3600L);
 
