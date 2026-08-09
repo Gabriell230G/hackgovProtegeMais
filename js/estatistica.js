@@ -207,7 +207,7 @@ const Estatistica = (() => {
     const c = dados.correlacaoScoreLead;
     leitura('est-leitura-dispersao',
       `${T('est.disp.1', 'A nuvem não tem direção:')} <b>r = ${num(c.r)}</b>
-       (r² = ${num(c.r2)}) — ${esc(c.leitura)}.
+       (r² = ${num(c.r2)}) — ${esc(T(c.leitura, c.leitura))}.
        ${T('est.disp.2', 'O score de confiabilidade praticamente não influencia o tempo de conclusão: uma denúncia bem documentada não é atendida mais rápido por ser bem documentada.')}
        ${T('est.disp.3', 'Vale lembrar que correlação não é causalidade, e que ausência de correlação linear não exclui outras formas de relação.')}`);
   }

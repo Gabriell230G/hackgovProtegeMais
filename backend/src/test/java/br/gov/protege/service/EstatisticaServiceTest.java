@@ -146,7 +146,7 @@ class EstatisticaServiceTest {
     void correlacaoSemVariacao() {
         Correlacao c = est.pearson(List.of(1.0, 1.0, 1.0), List.of(3.0, 5.0, 9.0));
         assertEquals(0.0, c.r(), 1e-9);
-        assertEquals("serie sem variacao", c.leitura());
+        assertEquals("corr.sem_variacao", c.leitura());
     }
 
     @Test
@@ -156,7 +156,7 @@ class EstatisticaServiceTest {
         // que se leia causalidade onde nao ha nem associacao.
         Correlacao c = est.pearson(List.of(1.0, 2.0, 3.0, 4.0), List.of(3.0, 1.0, 4.0, 2.0));
         assertTrue(Math.abs(c.r()) < 0.30);
-        assertTrue(c.leitura().contains("nula") || c.leitura().contains("fraca"),
+        assertTrue(c.leitura().equals("corr.nula") || c.leitura().startsWith("corr.fraca"),
                 "leitura obtida: " + c.leitura());
     }
 }

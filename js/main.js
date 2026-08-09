@@ -890,19 +890,60 @@ function _renderAnexos(denuncia) {
 }
 
 // ── Login ────────────────────────────────────────────────────
-function fazerLogin() {
-  const user = document.getElementById('login-user')?.value;
-  const pass = document.getElementById('login-pass')?.value;
-  const err  = document.getElementById('login-error');
-  if (user === 'admin' && pass === 'admin123') {
-    if (err) err.style.display = 'none';
+/**
+ * Autenticacao do servidor publico.
+ *
+ * Ate a Fase 4 esta funcao comparava usuario e senha com uma string fixa
+ * no proprio JavaScript. Funcionava para demonstrar a navegacao, mas era
+ * uma porta pintada na parede: qualquer pessoa que abrisse o console do
+ * navegador entrava, e o painel afirmava proteger dado sensivel enquanto a
+ * credencial estava escrita no codigo que o cidadao baixa.
+ *
+ * Agora quem autentica e a API. A senha viaja para o servidor, e comparada
+ * contra o hash BCrypt e o que volta e um token assinado com o perfil real.
+ * O front nao decide quem entra - ele so mostra o que o token permite.
+ *
+ * Com a API fora do ar o acesso e RECUSADO, em vez de cair num atalho local.
+ * Sem servidor nao existe autenticacao: liberar o painel ali seria repor a
+ * mesma credencial fixa que acabou de sair daqui.
+ */
+async function fazerLogin() {
+  const email = document.getElementById('login-user')?.value?.trim();
+  const senha = document.getElementById('login-pass')?.value;
+  const err   = document.getElementById('login-error');
+  const botao = document.querySelector('#page-login .btn-primary');
+
+  const recusar = chave => {
+    if (err) {
+      err.textContent = (typeof I18n !== 'undefined' ? I18n.t(chave) : chave);
+      err.style.display = 'block';
+    }
+  };
+
+  if (!email || !senha) return recusar('login.erro.vazio');
+  if (err) err.style.display = 'none';
+  if (botao) { botao.disabled = true; botao.textContent = I18n.t('login.entrando'); }
+
+  try {
+    if (typeof Backend === 'undefined' || !(await Backend.estaOnline())) {
+      return recusar('login.erro.offline');
+    }
+    const dados = await Backend.login(email, senha);
+    if (!dados) return recusar('login.erro.credencial');
+
+    if (typeof Acesso !== 'undefined') Acesso.aplicarAutenticado(dados.role, email);
     navigate('dashboard');
-  } else {
-    if (err) err.style.display = 'block';
+  } catch (e) {
+    recusar('login.erro.credencial');
+  } finally {
+    if (botao) { botao.disabled = false; botao.textContent = I18n.t('login.entrar'); }
   }
 }
 
 function fazerLogout() {
+  // Descarta o token: sair da tela sem soltar a credencial deixaria a sessao
+  // aberta para a proxima pessoa que usar o mesmo navegador.
+  if (typeof Backend !== 'undefined') Backend.logout();
   navigate('landing');
   if (document.getElementById('login-user')) document.getElementById('login-user').value = '';
   if (document.getElementById('login-pass')) document.getElementById('login-pass').value = '';

@@ -70,7 +70,14 @@ public class EstatisticaService {
             double cercaInf, double cercaSup, List<Double> outliers,
             double assimetria) {}
 
-    /** Correlacao linear entre duas series de mesmo tamanho. */
+    /**
+     * Correlacao linear entre duas series de mesmo tamanho.
+     *
+     * @param leitura CHAVE de traducao, nao frase pronta. Se o servidor
+     *                devolvesse "correlacao fraca e negativa", o painel em
+     *                ingles exibiria portugues no meio da tela - e a acentuacao
+     *                do texto passaria a depender do encoding do arquivo .java.
+     */
     public record Correlacao(int n, double r, double r2, String leitura) {}
 
     private static final Descritiva VAZIA = new Descritiva(
@@ -172,7 +179,7 @@ public class EstatisticaService {
      */
     public Correlacao pearson(List<Double> x, List<Double> y) {
         int n = Math.min(x.size(), y.size());
-        if (n < 2) return new Correlacao(n, 0, 0, "amostra insuficiente");
+        if (n < 2) return new Correlacao(n, 0, 0, "corr.insuficiente");
 
         double mx = 0, my = 0;
         for (int i = 0; i < n; i++) { mx += x.get(i); my += y.get(i); }
@@ -184,20 +191,26 @@ public class EstatisticaService {
             cov += dx * dy; vx += dx * dx; vy += dy * dy;
         }
         // Serie constante: sem variacao nao ha o que correlacionar.
-        if (vx == 0 || vy == 0) return new Correlacao(n, 0, 0, "serie sem variacao");
+        if (vx == 0 || vy == 0) return new Correlacao(n, 0, 0, "corr.sem_variacao");
 
         double r = cov / Math.sqrt(vx * vy);
         return new Correlacao(n, duasCasas(r * 100) / 100, duasCasas(r * r * 100) / 100, ler(r));
     }
 
+    /**
+     * Traduz o valor de r numa faixa qualitativa, devolvida como chave.
+     *
+     * Abaixo de 0,10 o sinal deixa de ter significado pratico: dizer
+     * "fraquissima e negativa" sugeriria uma direcao que o dado nao sustenta.
+     * Por isso a faixa mais baixa nao carrega sentido.
+     */
     private String ler(double r) {
         double a = Math.abs(r);
-        String forca = a < 0.10 ? "praticamente nula"
-                     : a < 0.30 ? "fraca"
+        if (a < 0.10) return "corr.nula";
+        String forca = a < 0.30 ? "fraca"
                      : a < 0.50 ? "moderada"
                      : a < 0.70 ? "forte"
-                     : "muito forte";
-        if (a < 0.10) return "correlacao " + forca;
-        return "correlacao " + forca + (r > 0 ? " e positiva" : " e negativa");
+                     : "muito_forte";
+        return "corr." + forca + (r > 0 ? "_positiva" : "_negativa");
     }
 }

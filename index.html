@@ -535,15 +535,19 @@
           <img src="./images/Logo Protege+ Gov.png" alt="Protege+" style="width:64px;height:64px;object-fit:contain;margin:0 auto 12px;display:block;" onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;background:linear-gradient(135deg,var(--blue-dark),var(--blue-light));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;&quot;>🛡</div>'">
           <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--blue-dark);text-align:center">PROTEGE<span style="color:var(--yellow)">+</span></div>
         </div>
-        <h2>Acesso ao Servidor</h2>
-        <p class="login-sub">Área restrita para servidores autorizados</p>
+        <h2 data-i18n="login.titulo">Acesso ao Servidor</h2>
+        <p class="login-sub" data-i18n="login.sub">Área restrita. A autenticação é feita pela API: a senha é conferida contra o hash BCrypt no servidor, que devolve um token assinado com o seu perfil.</p>
         <div class="login-error" id="login-error">Usuário ou senha incorretos.</div>
-        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Digite seu usuário" onkeypress="if(event.key==='Enter')fazerLogin()"></div>
-        <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Digite sua senha" onkeypress="if(event.key==='Enter')fazerLogin()"></div>
-        <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px;background:var(--gray-50);padding:10px;border-radius:6px;">
-          💡 Demo: usuário <strong>admin</strong> / senha <strong>admin123</strong>
+        <div class="form-group"><label data-i18n="login.email">E-mail institucional</label><input type="email" id="login-user" placeholder="nome@protege.gov.br" data-i18n="login.email_ph" data-i18n-prop="placeholder" onkeypress="if(event.key==='Enter')fazerLogin()"></div>
+        <div class="form-group"><label data-i18n="login.senha">Senha</label><input type="password" id="login-pass" placeholder="Digite sua senha" data-i18n="login.senha_ph" data-i18n-prop="placeholder" onkeypress="if(event.key==='Enter')fazerLogin()"></div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px;background:var(--gray-50);padding:10px;border-radius:6px;line-height:1.7;">
+          <span data-i18n="login.demo">💡 Contas de demonstração — cada uma recebe um perfil diferente do servidor:</span><br>
+          <strong>admin@protege.gov.br</strong> / admin123<br>
+          <strong>gestor@protege.gov.br</strong> / gestor123<br>
+          <strong>atendente@protege.gov.br</strong> / atendente123<br>
+          <strong>auditor@protege.gov.br</strong> / auditor123
         </div>
-        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="fazerLogin()">Entrar</button>
+        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="fazerLogin()" data-i18n="login.entrar">Entrar</button>
       </div>
     </div>
     <footer>

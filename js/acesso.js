@@ -137,9 +137,40 @@ const Acesso = (() => {
     return copia;
   }
 
+  /** Traduz a role que o token declara para o papel usado nesta tela. */
+  const POR_ROLE = {
+    ADMIN: 'master', GESTOR: 'gestor', ATENDENTE: 'analista', AUDITOR: 'auditor',
+  };
+
+  /**
+   * Aplica o perfil de quem acabou de se autenticar na tela de login.
+   *
+   * Diferente de definir(), nao faz login: o token ja existe. Quem manda e a
+   * role que o SERVIDOR colocou no token, nao o que o usuario digitou nem o
+   * que esta tela imagina. Um e-mail desconhecido cai no perfil mais restrito
+   * em vez de no mais permissivo - errar para o lado de negar acesso.
+   */
+  function aplicarAutenticado(role, email) {
+    papelAtual = POR_ROLE[String(role).toUpperCase()] || 'analista';
+    const cfg = PERMISSOES[papelAtual];
+
+    document.querySelectorAll('.papel-opt').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('papel-' + (papelAtual === 'analista' ? 'analista' : papelAtual));
+    if (btn) btn.classList.add('active');
+
+    const lbl = document.getElementById('user-role-label');
+    if (lbl) lbl.textContent = cfg.label + ' • ' + role;
+    const nome = document.querySelector('.user-name');
+    if (nome && email) nome.textContent = email;
+
+    aplicar();
+    return papelAtual;
+  }
+
   function init() { aplicar(); }
 
-  return { papel, pode, podeVerAba, perfilServidor, definir, aplicar, mascarar, init, PERMISSOES };
+  return { papel, pode, podeVerAba, perfilServidor, definir, aplicarAutenticado,
+           aplicar, mascarar, init, PERMISSOES };
 })();
 
 window.Acesso = Acesso;
