@@ -16,7 +16,7 @@ Você precisa apenas de um **JDK 17 ou superior**. O Maven é baixado automatica
 
 ```bash
 cd backend
-.\build.cmd clean test     # Windows — roda os 24 testes
+.\build.cmd clean test     # Windows — roda os 49 testes
 .\build.cmd run            # sobe a API em http://localhost:8080
 ```
 
