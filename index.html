@@ -278,6 +278,20 @@
     </div>
   </section>
 
+  <!-- VIDEO DO PITCH — exigido no documento, na apresentacao e no site -->
+  <section class="video-section" id="video">
+    <div class="video-box">
+      <div class="video-ic">🎥</div>
+      <div class="video-txt">
+        <h3 data-i18n="video.titulo">Conheça o Protege+ em 5 minutos</h3>
+        <p data-i18n="video.sub">Apresentação do projeto e demonstração do sistema em funcionamento: registro de denúncia, painel do servidor, fila de priorização e trilha de auditoria.</p>
+      </div>
+      <a class="btn btn-primary" id="link-video"
+         href="https://youtu.be/SUBSTITUIR-PELO-LINK"
+         target="_blank" rel="noopener noreferrer" data-i18n="video.assistir">▶ Assistir no YouTube</a>
+    </div>
+  </section>
+
   <section class="form-section" id="formulario">
         <div class="react-link">
           <span class="react-link-ic">⚛️</span>
@@ -717,7 +731,15 @@
       <div class="dashboard-content" id="tab-backlog" style="display:none">
         <div class="table-card">
           <div class="table-header">
-            <h3>Backlog de Denúncias</h3>
+            <h3 data-i18n="backlog.titulo">Backlog de Denúncias</h3>
+            <button class="fluxo-btn secundario" id="btn-exportar" onclick="exportarDenuncias()"
+                    data-i18n="backlog.exportar">⬇ Exportar CSV</button>
+          </div>
+          <div class="export-nota" data-i18n="backlog.exportar_nota">
+            A exportação é gerada pelo servidor, restrita aos perfis Gestor e Administrador, e
+            fica registrada na trilha de auditoria. O arquivo não inclui o relato das denúncias:
+            as perguntas de gestão não precisam do texto, e uma planilha com centenas de relatos
+            circulando por e-mail seria o vazamento que o resto do sistema evita.
           </div>
 
           <!-- FILTROS AVANÇADOS -->
@@ -1157,6 +1179,8 @@
   <script src="./js/fluxo.js"></script>
   <script src="./js/auditoria.js"></script>
   <script src="./js/estatistica.js"></script>
+  <script src="./js/sincronia.js"></script>
+  <script src="./js/evidencias.js"></script>
 <script src="./js/main.js"></script>
 
 <script>

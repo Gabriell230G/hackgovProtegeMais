@@ -59,6 +59,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/denuncias/protocolo/**").permitAll()
                 .requestMatchers("/api/auth/**", "/api/vigia/status").permitAll()
 
+                // Anexar evidencia e publico pelo protocolo: quem denuncia
+                // anonimamente nao tem conta para autenticar. No lugar da
+                // autenticacao entram limites - tamanho, quantidade, formato
+                // verificado pela assinatura e limite por origem.
+                .requestMatchers(HttpMethod.POST, "/api/denuncias/protocolo/*/evidencias").permitAll()
+
                 // ---- Documentacao e console do banco de demonstracao ----
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
                                  "/v3/api-docs/**", "/h2-console/**").permitAll()
@@ -68,8 +74,17 @@ public class SecurityConfig {
                 .requestMatchers("/api/auditoria/**")
                     .hasAnyRole(PerfilUsuario.AUDITOR.name(), PerfilUsuario.ADMIN.name())
 
-                // ---- EXCLUSAO DE DENUNCIA ----
+                // ---- EXPORTACAO DE DADOS ----
+                // A operacao de maior exposicao do sistema: entrega centenas de
+                // registros de uma vez, num arquivo que passa a circular fora
+                // de qualquer controle de acesso.
+                .requestMatchers("/api/exportacao/**")
+                    .hasAnyRole(PerfilUsuario.GESTOR.name(), PerfilUsuario.ADMIN.name())
+
+                // ---- EXCLUSAO DE DENUNCIA E DE ANEXO ----
                 .requestMatchers(HttpMethod.DELETE, "/api/denuncias/**")
+                    .hasAnyRole(PerfilUsuario.GESTOR.name(), PerfilUsuario.ADMIN.name())
+                .requestMatchers(HttpMethod.DELETE, "/api/evidencias/**")
                     .hasAnyRole(PerfilUsuario.GESTOR.name(), PerfilUsuario.ADMIN.name())
 
                 // ---- GESTAO DA EQUIPE ----

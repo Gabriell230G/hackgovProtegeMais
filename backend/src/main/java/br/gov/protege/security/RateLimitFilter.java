@@ -47,6 +47,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
     // sao 28.800 tentativas por dia contra hashes BCrypt.
     private static final int LIMITE_LOGIN    = 20;   // por minuto, por IP
 
+    // Upload e publico e grava em disco. Sem teto, um unico endereco enche o
+    // volume do servidor com arquivos validos - nao e preciso explorar falha
+    // nenhuma, basta repetir.
+    private static final int LIMITE_UPLOAD   = 10;   // por minuto, por IP
+
     private final Map<String, Deque<Long>> historico = new ConcurrentHashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -69,6 +74,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String uri = req.getRequestURI();
         if ("/api/denuncias".equals(uri)) return LIMITE_DENUNCIA;
         if ("/api/auth/login".equals(uri)) return LIMITE_LOGIN;
+        if (uri.startsWith("/api/denuncias/protocolo/") && uri.endsWith("/evidencias")) {
+            return LIMITE_UPLOAD;
+        }
         return 0;
     }
 

@@ -218,3 +218,58 @@ tr.aud-negado td{ background:#fef2f2; }
   display:block;margin-top:8px;padding:9px 11px;border-radius:8px;
   background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-weight:500;
 }
+
+
+/* ---------- Chamada para o vídeo do pitch ---------- */
+.video-section{ padding:0 24px 8px; max-width:1200px; margin:0 auto; }
+.video-box{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  background:linear-gradient(135deg,#0f2f6b,#1d4ed8);
+  border-radius:16px;padding:22px 26px;color:#fff;
+}
+.video-ic{ font-size:34px;flex:0 0 auto; }
+.video-txt{ flex:1 1 320px; }
+.video-txt h3{ margin:0 0 4px;font-size:18px;font-family:'Sora',sans-serif; }
+.video-txt p{ margin:0;font-size:13.5px;line-height:1.6;opacity:.9; }
+.video-box .btn{ flex:0 0 auto;background:#FFC72C;color:#0f2f6b;border:none;font-weight:700; }
+.video-box .btn:hover{ filter:brightness(1.05); }
+
+/* ---------- Exportação ---------- */
+.export-nota{
+  font-size:12px;color:#64748b;line-height:1.55;margin-bottom:14px;
+  padding-left:12px;border-left:3px solid #e2e8f0;
+}
+
+/* ---------- Evidências ---------- */
+.evid-lista{ display:flex;flex-direction:column;gap:8px;margin-top:10px; }
+.evid-item{
+  display:flex;align-items:center;gap:10px;
+  border:1px solid #e2e8f0;border-radius:10px;padding:9px 12px;background:#fff;
+}
+.evid-ic{ font-size:18px;flex:0 0 auto; }
+.evid-corpo{ flex:1;min-width:0; }
+.evid-nome{ font-size:13px;color:#0f172a;font-weight:600;word-break:break-all; }
+.evid-meta{ font-size:11.5px;color:#94a3b8;margin-top:2px; }
+.evid-hash{ font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#cbd5e1; }
+.evid-vazio{ font-size:12.5px;color:#94a3b8;padding:10px 2px; }
+
+.evid-overlay{
+  display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);
+  z-index:9500;align-items:center;justify-content:center;padding:16px;
+}
+.evid-overlay.active{ display:flex; }
+.evid-box{
+  background:#fff;border-radius:16px;max-width:560px;width:100%;
+  padding:26px;box-shadow:0 20px 50px rgba(0,0,0,.3);
+  max-height:80vh;overflow:auto;
+}
+.evid-box .ico{ font-size:34px;text-align:center;margin-bottom:8px; }
+.evid-box h3{ font-size:18px;color:#0F172A;margin-bottom:6px;text-align:center; }
+.evid-box > p{ font-size:14px;color:#475569;text-align:center;margin-bottom:14px; }
+.evid-acoes{ display:flex;justify-content:flex-end;margin-top:16px; }
+
+.kc-anexos{
+  margin-left:auto;border:1px solid #e2e8f0;background:#fff;border-radius:6px;
+  padding:1px 7px;font-size:13px;cursor:pointer;line-height:1.6;
+}
+.kc-anexos:hover{ border-color:#cbd5e1;background:#f8fafc; }

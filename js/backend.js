@@ -298,6 +298,78 @@ const Backend = (() => {
     throw Object.assign(new Error(await erroDa(res)), { status: res.status });
   }
 
+  // ── Evidencias (arquivos anexados) ───────────────────────────
+
+  /**
+   * Anexa um arquivo a uma denuncia recem-registrada.
+   *
+   * Publico, identificado pelo protocolo: quem denuncia anonimamente nao tem
+   * conta para autenticar. Nao ha fallback local - guardar o arquivo em
+   * Base64 no localStorage foi o que a Fase 4 fazia, e era o que esbarrava
+   * no teto de ~5 MB por origem do navegador.
+   */
+  async function anexarEvidencia(protocolo, arquivo) {
+    if (!(await estaOnline())) {
+      throw new Error('Anexar arquivo exige a API no ar.');
+    }
+    const corpo = new FormData();
+    corpo.append('arquivo', arquivo);
+    // Sem Content-Type manual: o navegador precisa gerar o boundary do multipart.
+    const res = await fetch(`${BASE}/denuncias/protocolo/${encodeURIComponent(protocolo)}/evidencias`,
+                            { method: 'POST', body: corpo });
+    if (res.ok) return res.json();
+    throw Object.assign(new Error(await erroDa(res)), { status: res.status });
+  }
+
+  async function listarEvidencias(idDenuncia) {
+    if (!(await estaOnline())) return [];
+    const res = await protegido(() =>
+      fetch(`${BASE}/denuncias/${idDenuncia}/evidencias`, { headers: authHeaders() }));
+    return res.ok ? res.json() : [];
+  }
+
+  /** Baixa o arquivo. Cada leitura gera registro de auditoria no servidor. */
+  async function baixarEvidencia(id, nomeSugerido) {
+    const res = await protegido(() =>
+      fetch(`${BASE}/evidencias/${id}/arquivo`, { headers: authHeaders() }));
+    if (!res.ok) throw Object.assign(new Error(await erroDa(res)), { status: res.status });
+    salvarComoArquivo(await res.blob(), nomeSugerido || ('evidencia-' + id));
+  }
+
+  async function removerEvidencia(id, motivo) {
+    if (!motivo || !motivo.trim()) throw new Error('Informe o motivo da remocao.');
+    const res = await protegido(() =>
+      fetch(`${BASE}/evidencias/${id}?motivo=${encodeURIComponent(motivo)}`,
+            { method: 'DELETE', headers: authHeaders() }));
+    if (res.status === 204) return true;
+    throw Object.assign(new Error(await erroDa(res)), { status: res.status });
+  }
+
+  // ── Exportacao ───────────────────────────────────────────────
+
+  /** Exporta em CSV. Restrito a GESTOR e ADMIN; a operacao e auditada. */
+  async function exportarCsv() {
+    if (!(await estaOnline())) throw new Error('A exportacao e gerada pelo servidor.');
+    const res = await protegido(() =>
+      fetch(`${BASE}/exportacao/denuncias`, { headers: authHeaders() }));
+    if (!res.ok) throw Object.assign(new Error(await erroDa(res)), { status: res.status });
+    const hoje = new Date().toISOString().split('T')[0];
+    salvarComoArquivo(await res.blob(), `protege_denuncias_${hoje}.csv`);
+  }
+
+  /** Dispara o download no navegador e devolve a URL temporaria ao sistema. */
+  function salvarComoArquivo(blob, nome) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Sem o revoke, cada download deixa o blob preso na memoria da aba.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   // ── VigIA (IA) ───────────────────────────────────────────────
   async function perguntarVigia(pergunta) {
     if (await estaOnline()) {
@@ -398,6 +470,7 @@ const Backend = (() => {
     consultarFila, atenderProximo, consultarPilha, desfazerUltima,
     consultarAuditoria, verificarIntegridade, acoesAuditadas,
     estatisticas, relatorioAnalitico, perguntarVigia, reanalisar, statusIa,
+    anexarEvidencia, listarEvidencias, baixarEvidencia, removerEvidencia, exportarCsv,
   };
 })();
 

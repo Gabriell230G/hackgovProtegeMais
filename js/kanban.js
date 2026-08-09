@@ -102,7 +102,7 @@ const Kanban = (() => {
         </div>
         <div class="kc-tipo">${tipo}</div>
         <div class="kc-local">${_esc(d.local || '')}</div>
-        <div class="kc-foot">${nivel}</div>
+        <div class="kc-foot">${nivel}${_botaoAnexos(d)}</div>
         ${atribuicao}
       </div>`;
   }
@@ -169,14 +169,33 @@ const Kanban = (() => {
     if (btnNao) btnNao.onclick = () => { if (typeof StatusConfirm !== 'undefined') StatusConfirm.cancelar(); };
   }
 
-  function _aplicar(id, novoStatus) {
+  /**
+   * Aplica a mudanca de status.
+   *
+   * Com a API no ar, quem decide e o servidor: ele valida a transicao, grava
+   * o passo na linha do tempo, empilha a acao para o desfazer e registra a
+   * alteracao na trilha de auditoria. Nada disso aconteceria se o arrastar do
+   * card so mexesse no localStorage - o Kanban mostraria um status que o
+   * banco nunca teve, e a auditoria nao teria o que registrar.
+   *
+   * Se o servidor recusar, a tela e redesenhada com o estado real: o card
+   * volta para a coluna de origem em vez de mentir que a mudanca ocorreu.
+   */
+  async function _aplicar(id, novoStatus) {
+    if (typeof Sincronia !== 'undefined' && Sincronia.ativa()) {
+      const ok = await Sincronia.mudarStatus(id, novoStatus);
+      if (ok && typeof showToast === 'function') showToast('✅ Status atualizado.');
+      if (!ok) render();
+      return;
+    }
+
     _mudarStatusDireto(id, novoStatus);
     render();
     // Sincroniza outras telas
     if (typeof renderStatusTable === 'function') renderStatusTable();
     if (typeof renderBacklog === 'function') renderBacklog();
     if (typeof updateKPIs === 'function') updateKPIs();
-    if (typeof showToast === 'function') showToast('✅ Status atualizado.');
+    if (typeof showToast === 'function') showToast('✅ Status atualizado (modo local).');
   }
 
   // Muda status gravando direto (cobre denúncias reais e mocks)
@@ -237,10 +256,24 @@ const Kanban = (() => {
     }
   }
 
-  function confirmarResp(id) {
+  async function confirmarResp(id) {
     const membroId = _pendentesResp[id];
-    atribuir(id, membroId);
     delete _pendentesResp[id];
+
+    // Com a API no ar, a atribuicao e gravada no servidor e registrada na
+    // trilha de auditoria. Definir quem responde por um caso e uma decisao
+    // que precisa de dono - e a acao ATRIBUICAO existe para isso.
+    if (typeof Sincronia !== 'undefined' && Sincronia.ativa()) {
+      const ok = await Sincronia.atribuirResponsavel(id, membroId ? Number(membroId) : null);
+      if (ok && typeof showToast === 'function') {
+        const m = (typeof Equipe !== 'undefined') ? Equipe.buscarPorId(membroId) : null;
+        showToast(m ? `👤 Atribuído a ${m.nome}.` : '👤 Atribuição removida.');
+      }
+      if (!ok) render();
+      return;
+    }
+
+    atribuir(id, membroId);
     render();   // redesenha mostrando o responsável atual e escondendo o botão
   }
 
@@ -267,6 +300,18 @@ const Kanban = (() => {
       const m = (typeof Equipe !== 'undefined') ? Equipe.buscarPorId(membroId) : null;
       showToast(m ? `👤 Atribuído a ${m.nome}.` : '👤 Atribuição removida.');
     }
+  }
+
+  /**
+   * Botao de anexos. So aparece quando os dados vieram da API: sem o id
+   * numerico do banco nao ha como consultar as evidencias, e um botao que
+   * nao funciona e pior do que botao nenhum.
+   */
+  function _botaoAnexos(d) {
+    if (!d.apiId || typeof Evidencias === 'undefined') return '';
+    return `<button class="kc-anexos" title="Anexos da denúncia"
+              onclick="event.stopPropagation();Evidencias.abrir(${d.apiId}, '${d.id}')"
+              ondragstart="event.preventDefault()">📎</button>`;
   }
 
   function _esc(s) {

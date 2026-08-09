@@ -431,6 +431,29 @@
        * com os campos invalidos em "detalhes" - por isso da para apontar o erro
        * no campo certo, em vez de exibir uma mensagem generica.
        */
+      /**
+       * Anexa um arquivo a uma denuncia ja registrada.
+       *
+       * O upload acontece DEPOIS do 201 porque cada arquivo precisa do
+       * protocolo, que so existe apos o registro. Enviar tudo num unico
+       * multipart faria a denuncia inteira falhar quando um anexo fosse
+       * recusado - e perder o registro por causa de uma foto e o pior
+       * desfecho possivel para quem esta denunciando.
+       *
+       * Nao ha Content-Type manual: o navegador precisa gerar o boundary.
+       */
+      async anexarEvidencia(protocolo, arquivo) {
+        const corpo = new FormData();
+        corpo.append('arquivo', arquivo);
+        const res = await fetch(
+          `${API_BASE}/denuncias/protocolo/${encodeURIComponent(protocolo.replace('#',''))}/evidencias`,
+          { method: 'POST', body: corpo });
+        if (res.status === 201) return res.json();
+        let msg = 'Arquivo recusado pelo servidor.';
+        try { msg = (await res.json()).mensagem || msg; } catch (_) {}
+        throw new Error(msg);
+      },
+
       async enviarDenuncia(dados) {
         const corpo = {
           tipo: dados.tipo,
@@ -570,7 +593,7 @@
     }
 
     // Modal de protocolo gerado
-    function ModalProtocolo({ protocolo, score, onClose }) {
+    function ModalProtocolo({ protocolo, score, aviso, onClose }) {
       const info = scoreInfo(score);
       return (
         <div className="modal-overlay" onClick={onClose}>
@@ -581,6 +604,18 @@
               Seu número de protocolo é:
             </p>
             <div className="modal-protocol">{protocolo}</div>
+            {aviso && (
+              <div style={{
+                background:'#fff7ed', border:'1px solid #fed7aa', color:'#9a3412',
+                borderRadius:10, padding:'10px 12px', fontSize:12.5, lineHeight:1.5,
+                margin:'10px 0', textAlign:'left'
+              }}>
+                ⚠️ {aviso}
+                <div style={{marginTop:4, color:'#b45309'}}>
+                  A denúncia foi registrada normalmente — apenas os anexos listados não entraram.
+                </div>
+              </div>
+            )}
             <div style={{
               display:'inline-block',
               padding:'6px 16px',
@@ -625,6 +660,8 @@
       const [submitMsg,     setSubmitMsg]     = useState('');
       const [protocolo,     setProtocolo]     = useState(null);
       const [scoreAtual,    setScoreAtual]    = useState(0);
+      const [arquivos,      setArquivos]      = useState([]);
+      const [avisoAnexo,    setAvisoAnexo]    = useState('');
 
       // ── Carrega estados ao montar ─────────────────────────
       useEffect(() => {
@@ -688,6 +725,22 @@
 
         try {
           const res = await ApiClient.enviarDenuncia(form);
+
+          // Anexos: um POST multipart por arquivo. Falha aqui NAO derruba a
+          // denuncia - ela ja esta registrada, e o protocolo ja e valido.
+          const recusados = [];
+          if (arquivos.length) setSubmitMsg('Enviando anexos...');
+          for (const arq of arquivos) {
+            try {
+              await ApiClient.anexarEvidencia(res.data.protocolo, arq);
+            } catch (e) {
+              recusados.push(`${arq.name}: ${e.message}`);
+            }
+          }
+          setAvisoAnexo(recusados.length
+            ? 'Alguns arquivos não foram aceitos — ' + recusados.join(' · ')
+            : '');
+
           setProtocolo({ numero: res.data.protocolo, score: res.data.score, scoreTxt: res.data.scoreTxt });
           setSubmitState('success');
           setSubmitMsg('Denúncia registrada com sucesso!');
@@ -710,6 +763,8 @@
           descricao:'', anonimo:true, nome:'', contato:'',
         });
         setErros({});
+        setArquivos([]);
+        setAvisoAnexo('');
       };
 
       // ── Render ────────────────────────────────────────────
@@ -754,6 +809,33 @@
                   />
                 </FormField>
               </div>
+
+              {/* ── Evidências ──
+                  O tipo do arquivo é conferido no SERVIDOR, pela assinatura do
+                  conteúdo. O accept abaixo é apenas conveniência: ele filtra o
+                  seletor do sistema operacional e é trivialmente contornável,
+                  então não vale como validação. */}
+              <FormField label="Evidências (opcional)">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp,application/pdf,audio/*,video/mp4"
+                  onChange={e => setArquivos(Array.from(e.target.files || []))}
+                />
+                <div style={{fontSize:12, color:'#64748b', marginTop:6, lineHeight:1.5}}>
+                  Fotos, PDF, áudio ou vídeo — até 5 MB cada, no máximo 10 arquivos.
+                  Os arquivos são enviados ao servidor após o registro da denúncia.
+                </div>
+                {arquivos.length > 0 && (
+                  <ul style={{margin:'8px 0 0', paddingLeft:18, fontSize:12.5, color:'#334155'}}>
+                    {arquivos.map((a, i) => (
+                      <li key={i}>{a.name} <span style={{color:'#94a3b8'}}>
+                        ({a.size > 1048576 ? (a.size/1048576).toFixed(1)+' MB'
+                                           : Math.max(1, Math.round(a.size/1024))+' KB'})</span></li>
+                    ))}
+                  </ul>
+                )}
+              </FormField>
 
               {/* ── Localização ── */}
               <div className="form-section-title" style={{marginTop:8}}>Localização</div>
@@ -907,6 +989,7 @@
             <ModalProtocolo
               protocolo={protocolo.numero}
               score={protocolo.score}
+              aviso={avisoAnexo}
               onClose={fecharModal}
             />
           )}

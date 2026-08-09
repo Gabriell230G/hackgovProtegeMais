@@ -108,7 +108,11 @@ function verificarProtocoloURL() {
 }
 
 function getAllDenuncias() {
-  const todas = [...denuncias, ...mockDenuncias];
+  // Com o banco no ar, os exemplos embutidos saem de cena. Misturar dado
+  // real com mock e o caminho mais curto para um numero de painel que
+  // ninguem consegue explicar de onde veio.
+  const daApi = typeof Sincronia !== 'undefined' && Sincronia.ativa();
+  const todas = daApi ? [...denuncias] : [...denuncias, ...mockDenuncias];
   // Decifra campos sensíveis na leitura (se a camada LGPD estiver ativa).
   // decifrar() é seguro em texto não-cifrado (retorna o próprio valor),
   // então mocks em claro passam intactos.
@@ -157,6 +161,12 @@ function navigate(page) {
   }
 
   if (page === 'dashboard') {
+    // O painel le do banco. A carga e assincrona: as telas desenham com o
+    // que ja existe e se redesenham quando os dados chegam, em vez de
+    // ficarem em branco esperando a rede.
+    if (typeof Sincronia !== 'undefined') {
+      Sincronia.hidratar(true).then(ok => { if (ok) Sincronia.redesenhar(); });
+    }
     ['backlog', 'status-d'].forEach(t => {
       const el = document.getElementById('tab-' + t);
       if (el) el.style.display = 'none';
@@ -482,6 +492,20 @@ function handleFiles(files) {
 // ────────────────────────────────────────────────────────────
 // Enviar denúncia — com Base64 real dos arquivos
 // ────────────────────────────────────────────────────────────
+/**
+ * Envia a denuncia ao servidor e anexa as evidencias.
+ *
+ * Com a API no ar, e o SERVIDOR que gera o protocolo e calcula o score. Ate
+ * a Fase 4 os dois nasciam aqui, no navegador: o contador do protocolo vinha
+ * do localStorage, o que fazia dois computadores diferentes produzirem o
+ * mesmo numero, e o score era uma segunda implementacao do algoritmo, livre
+ * para divergir da do servidor sem que ninguem percebesse.
+ *
+ * As evidencias sao enviadas DEPOIS do 201, uma a uma, porque cada arquivo
+ * precisa do protocolo que so existe apos o registro. Falha em anexar nao
+ * derruba a denuncia: o registro ja esta feito, e perde-lo por causa de uma
+ * foto seria o pior desfecho possivel para quem esta denunciando.
+ */
 async function enviarDenuncia() {
   const tipo      = document.getElementById('f-tipo')?.value;
   const descricao = document.getElementById('f-descricao')?.value;
@@ -492,6 +516,20 @@ async function enviarDenuncia() {
   // Botão de loading enquanto converte arquivos
   const btnEnviar = document.querySelector('[onclick="enviarDenuncia()"]');
   if (btnEnviar) { btnEnviar.disabled = true; btnEnviar.innerHTML = '⏳ Processando...'; }
+
+  if (typeof Backend !== 'undefined' && await Backend.estaOnline()) {
+    try {
+      await _enviarPelaApi(tipo, descricao, btnEnviar);
+      return;
+    } catch (e) {
+      // Erro de validacao do servidor: mostra o motivo e NAO grava local.
+      // Cair para o localStorage aqui daria ao cidadao um protocolo que o
+      // orgao nunca vai encontrar.
+      if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.innerHTML = '📤 Enviar Denúncia'; }
+      showToast('❌ ' + e.message);
+      return;
+    }
+  }
 
   protocolCount++;
   localStorage.setItem('protocolCount',   protocolCount);
@@ -654,6 +692,113 @@ async function enviarDenuncia() {
   descartarAudio();
 }
 
+/**
+ * Caminho da API: registra a denuncia, anexa os arquivos e abre o modal.
+ * Lanca excecao se o servidor recusar - quem chamou decide o que fazer.
+ */
+async function _enviarPelaApi(tipo, descricao, btnEnviar) {
+  const estadoRaw = document.getElementById('f-estado')?.value || '';
+  const corpo = {
+    tipo,
+    descricao,
+    estado:   estadoRaw.split(' ')[0].trim().toUpperCase().slice(0, 2),
+    cidade:   document.getElementById('f-cidade')?.value || '',
+    endereco: document.getElementById('f-endereco')?.value || '',
+    anonimo:  document.getElementById('f-anonimo')?.checked || false,
+  };
+
+  const criada = await Backend.criarDenuncia(corpo);
+  const protocolo = criada.protocolo;
+  lastProtocol = protocolo;
+
+  // ── Anexos: um POST multipart por arquivo ──────────────────
+  const recusados = [];
+  if (uploadedFiles.length && btnEnviar) {
+    btnEnviar.innerHTML = '⏳ Enviando anexos...';
+  }
+  for (const arquivo of uploadedFiles) {
+    try {
+      await Backend.anexarEvidencia(protocolo, arquivo);
+    } catch (e) {
+      recusados.push(`${arquivo.name}: ${e.message}`);
+    }
+  }
+  // O audio gravado no navegador segue pelo mesmo caminho dos demais anexos.
+  if (audioBlob) {
+    try {
+      await Backend.anexarEvidencia(protocolo,
+        new File([audioBlob], 'relato-em-audio.webm', { type: audioBlob.type || 'audio/webm' }));
+    } catch (e) {
+      recusados.push('relato em áudio: ' + e.message);
+    }
+  }
+
+  // ── Modal de sucesso, com o protocolo e o score DO SERVIDOR ──
+  document.getElementById('modal-protocol-num').textContent = protocolo;
+  const badge = document.getElementById('modal-score-badge');
+  if (badge && typeof ScoreSystem !== 'undefined') {
+    badge.innerHTML = ScoreSystem.renderBadge({
+      score: criada.score, label: criada.score >= 70 ? 'high' : criada.score >= 40 ? 'medium' : 'low',
+      classificacao: criada.scoreTxt,
+    });
+  }
+  gerarQRCode(protocolo);
+
+  const codigoBloco = document.getElementById('modal-codigo-bloco');
+  if (codigoBloco) codigoBloco.style.display = 'none';
+  document.getElementById('modal-protocolo').classList.add('active');
+
+  if (recusados.length) {
+    showToast('⚠️ Denúncia registrada, mas alguns arquivos não foram aceitos: ' + recusados.join(' · '));
+  }
+
+  if (btnEnviar) { btnEnviar.disabled = false; btnEnviar.innerHTML = '📤 Enviar Denúncia'; }
+  _limparFormulario();
+
+  // O painel do gestor passa a enxergar o caso novo sem recarregar a página.
+  if (typeof Sincronia !== 'undefined') Sincronia.hidratar(true);
+}
+
+/** Zera o formulário depois de um envio bem-sucedido. */
+function _limparFormulario() {
+  ['f-tipo', 'f-estado', 'f-endereco', 'f-descricao', 'f-nome', 'f-contato', 'f-data']
+    .forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
+  const cidadeEl = document.getElementById('f-cidade');
+  if (cidadeEl) {
+    if (cidadeEl.tagName === 'SELECT') {
+      cidadeEl.innerHTML = '<option value="">Selecione o estado primeiro</option>';
+    } else { cidadeEl.value = ''; }
+  }
+  const anonEl = document.getElementById('f-anonimo');
+  if (anonEl) anonEl.checked = false;
+  const fileList = document.getElementById('file-list');
+  if (fileList) fileList.innerHTML = '';
+  uploadedFiles = [];
+  if (typeof descartarAudio === 'function') descartarAudio();
+}
+
+/**
+ * Baixa a exportação em CSV.
+ *
+ * O arquivo é montado pelo servidor, e não aqui, por três razões: só o
+ * servidor conhece o perfil de quem pediu (e portanto o que mascarar), só
+ * ele consegue registrar a operação na trilha de auditoria, e só ele tem a
+ * base inteira — o navegador tem apenas a página que está exibindo.
+ */
+async function exportarDenuncias() {
+  const btn = document.getElementById('btn-exportar');
+  const rotulo = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Gerando…'; }
+  try {
+    await Backend.exportarCsv();
+    showToast('⬇ Exportação gerada. A operação ficou registrada na trilha de auditoria.');
+  } catch (e) {
+    showToast((e.status === 403 ? '🚫 ' : '❌ ') + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = rotulo; }
+  }
+}
+
 function closeModal() {
   document.getElementById('modal-protocolo')?.classList.remove('active');
 }
@@ -666,7 +811,17 @@ function acompanharDenuncia() {
 }
 
 // ── Status ───────────────────────────────────────────────────
-function buscarProtocolo() {
+/**
+ * Consulta publica por protocolo.
+ *
+ * Pergunta ao servidor primeiro. Sem isso, o cidadao que registrasse a
+ * denuncia num computador e a consultasse em outro receberia "protocolo nao
+ * identificado" - o dado existia, so nao naquele navegador.
+ *
+ * A resposta da API traz apenas situacao e linha do tempo: relato, endereco
+ * e analise interna nao saem por este canal.
+ */
+async function buscarProtocolo() {
   const input     = document.getElementById('protocolo-input')?.value.trim();
   const container = document.getElementById('status-result');
   if (!container) return;
@@ -674,7 +829,25 @@ function buscarProtocolo() {
   if (!input) { container.innerHTML = ''; return; }
 
   const normalizar = s => (s || '').replace(/^#/, '').trim().toLowerCase();
-  const found = getAllDenuncias().find(d => d.id && normalizar(d.id) === normalizar(input));
+
+  let found = null;
+  if (typeof Backend !== 'undefined') {
+    try {
+      const api = await Backend.buscarProtocolo(input.replace(/^#/, ''));
+      if (api && api.protocolo) {
+        found = {
+          id: api.protocolo, protocolo: api.protocolo, tipo: api.tipo,
+          local: api.local, status: api.status, score: api.score,
+          scoreTxt: api.scoreTxt, historico: api.historico || [],
+          data: api.criadoEm ? String(api.criadoEm).split('T')[0] : '',
+          desc: '', endereco: '', anonimo: true,
+        };
+      }
+    } catch (_) { /* API fora do ar: cai para o armazenamento local */ }
+  }
+  if (!found) {
+    found = getAllDenuncias().find(d => d.id && normalizar(d.id) === normalizar(input));
+  }
 
   if (!found) {
     container.innerHTML = `
