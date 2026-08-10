@@ -175,7 +175,7 @@ const Anonimato = (() => {
 
   // ── Estado da seleção no formulário ─────────────────────────
   let nivelSelecionado = 2;
-  function getNivelSelecionado() { return nivelSelecionado; }
+
   function setNivelSelecionado(n) { nivelSelecionado = n; }
 
   return {
@@ -183,7 +183,7 @@ const Anonimato = (() => {
     consultarPorCodigo, consultarPorProtocolo,
     adicionarMensagem, marcarMensagensLidas, temPendencia,
     rotulo, temCanal,
-    getNivelSelecionado, setNivelSelecionado,
+    setNivelSelecionado,
   };
 })();
 

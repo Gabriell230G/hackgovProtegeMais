@@ -95,7 +95,9 @@ const Kanban = (() => {
     return `
       <div class="kanban-card" draggable="true"
            ondragstart="Kanban._dragStart(event, '${d.id}')"
-           ondragend="Kanban._dragEnd(event)">
+           ondragend="Kanban._dragEnd(event)"
+           onclick="if(typeof verDetalhes==='function') verDetalhes('${d.id}')"
+           title="Clique para abrir a ficha do caso">
         <div class="kc-top">
           <span class="kc-proto">${d.id}</span>
           ${emerg}

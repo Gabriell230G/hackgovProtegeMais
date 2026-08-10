@@ -172,7 +172,9 @@ São **31 mapeamentos** no total. **15** deles estão anotados com `@Auditavel` 
 
 **Cidadão** — denúncia com anonimato graduado em três níveis, incluindo canal de retorno anônimo bidirecional; consulta por protocolo; botão de emergência com geolocalização; **Modo Seguro**, que disfarça a tela como um buscador; botão de pânico com saída imediata; múltiplos idiomas; chatbot de atendimento.
 
-**Gestor** — login com perfil, Kanban das denúncias, gestão de equipe, mapa coroplético com limiar de privacidade, score de confiabilidade, fila de priorização automática, pilha de ações reversíveis, trilha de auditoria e o **VigIA**, copiloto que classifica urgência e resume relatos.
+**Gestor** — login com perfil, Kanban das denúncias, **ficha completa do caso** (relato, endereço mascarado conforme o perfil, anexos, edição e exclusão com motivo), gestão de equipe, mapa coroplético com limiar de privacidade, fila de priorização automática, pilha de ações reversíveis, trilha de auditoria e o **VigIA**, copiloto que classifica urgência, resume relatos e responde perguntas livres — sempre declarando se está em modo Gemini ou Regras.
+
+Abrir a ficha de um caso gera registro de auditoria. É ali que o mascaramento por perfil fica visível: o mesmo caso aberto por um ATENDENTE mostra `[endereço protegido]`, e aberto por um GESTOR mostra o endereço real. A diferença é decidida no servidor — o front apenas exibe o que recebeu.
 
 **Relatório estatístico** — aba própria no painel, com seis gráficos alimentados por `/api/stats/analitico`. Cada gráfico vem acompanhado da **leitura do que ele mostra**, gerada a partir dos próprios números e não de frases fixas: um gráfico sem leitura transfere para o gestor o trabalho de interpretar, que é justamente o que o painel deveria estar fazendo por ele.
 
@@ -205,7 +207,7 @@ cd backend
 .\build.cmd clean test
 ```
 
-**81 testes** em 10 classes, cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha, detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou — toda a estatística descritiva do relatório, a detecção de tipo de arquivo pela assinatura, a higienização de nomes contra *path traversal* e a neutralização de injeção de fórmula em CSV.
+**81 testes** em 11 classes, cobrindo: regras do score, classificação de urgência do VigIA, ordenação da fila de prioridade, comportamento LIFO da pilha, detecção de adulteração da trilha de auditoria — incluindo testes que alteram e removem registros de propósito e exigem que o sistema aponte onde a cadeia quebrou — toda a estatística descritiva do relatório, a detecção de tipo de arquivo pela assinatura, a higienização de nomes contra *path traversal* e a neutralização de injeção de fórmula em CSV.
 
 Os valores esperados nos testes de estatística foram calculados à mão e estão documentados no cabeçalho de cada classe. Um teste que confere o programa contra a saída do próprio programa passa a fingir que a conta está certa exatamente quando ela deixa de estar.
 
@@ -225,7 +227,7 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
 │   ├── kanban.css              painel do servidor
 │   ├── painel-api.css          etiqueta de conexão, fila, pilha e auditoria
 │   └── anonimato · emergencia · lgpd · panico
-├── js/                         26 módulos
+├── js/                         27 módulos
 │   ├── backend.js              ponte com a API (JWT + fallback localStorage)
 │   ├── conexao.js              etiqueta de origem dos dados: API ou local
 │   ├── fluxo.js                fila de priorização e pilha de desfazer
@@ -233,6 +235,7 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
 │   ├── estatistica.js          relatório estatístico com gráficos e leitura de cada um
 │   ├── sincronia.js            traz o portal e o painel para o banco
 │   ├── evidencias.js           anexos: listar, baixar e remover
+│   ├── detalhe.js              ficha do caso: relato, anexos, editar e excluir
 │   ├── acesso.js               troca de perfil com login real na API
 │   ├── equipe.js               equipe servida pela API, com cache em memória
 │   ├── anonimato.js            anonimato graduado e elo de mão dupla
@@ -250,7 +253,7 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
     ├── build.cmd / build.ps1   bootstrap: baixa o Maven se necessário
     ├── pom.xml
     └── src/
-        ├── main/java/br/gov/protege/      61 classes
+        ├── main/java/br/gov/protege/      63 classes
         │   ├── audit/        @Auditavel e o interceptador da trilha
         │   ├── config/       OpenAPI
         │   ├── controller/   9 controladores, 31 rotas, tratamento de erros
@@ -262,7 +265,7 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
         │   ├── security/     JWT, RBAC, CORS, limite de requisições
         │   ├── service/      score, IA, fila, pilha, auditoria e estatística
         │   └── util/         mascaramento, assinatura de arquivo e nomes seguros
-        └── test/java/...     10 classes, 81 testes JUnit
+        └── test/java/...     11 classes, 81 testes JUnit
 ```
 
 ---

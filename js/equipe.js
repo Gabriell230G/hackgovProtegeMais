@@ -49,7 +49,7 @@ const Equipe = (() => {
   }
 
   // ── Leituras síncronas, servidas pelo cache ──────────────────
-  function listar() { return cache; }
+
 
   function buscarPorId(id) {
     if (id == null) return null;
@@ -147,7 +147,7 @@ const Equipe = (() => {
   // os nomes dos responsáveis na primeira renderização.
   document.addEventListener('DOMContentLoaded', () => { setTimeout(sincronizar, 300); });
 
-  return { listar, adicionar, remover, render, sincronizar, opcoesSelect, buscarPorId };
+  return { adicionar, remover, render, sincronizar, opcoesSelect, buscarPorId };
 })();
 
 window.Equipe = Equipe;

@@ -213,5 +213,61 @@ const VigIA = (() => {
     `;
   }
 
-  return { analisar };
+  /**
+   * Declara em que modo a IA do servidor esta operando.
+   *
+   * Um copiloto que nao diz de onde vem a sugestao pede confianca cega. Com
+   * a chave do Gemini configurada a analise e generativa; sem ela o servidor
+   * cai para regras explicaveis - e a diferenca precisa estar na tela, nao
+   * so no log. E a mesma razao pela qual a coluna origem_analise e
+   * persistida em cada denuncia.
+   */
+  async function declararOrigem() {
+    const alvo = document.getElementById('vigia-origem');
+    if (!alvo || typeof Backend === 'undefined') return;
+    try {
+      const s = await Backend.statusIa();
+      if (!s || !s.modo) { alvo.textContent = ''; return; }
+      const gemini = String(s.modo).toUpperCase().includes('GEMINI');
+      alvo.textContent = gemini ? 'modo Gemini' : 'modo Regras';
+      alvo.className = 'vigia-origem ' + (gemini ? 'gemini' : 'regras');
+      alvo.title = gemini
+        ? 'Analise generativa. Cada denuncia guarda a origem da decisao.'
+        : 'Sem chave de IA configurada: o servidor usa regras explicaveis. '
+          + 'A ausencia da IA degrada a qualidade da sugestao, nao a operacao do canal.';
+    } catch (_) { alvo.textContent = ''; }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => setTimeout(declararOrigem, 800));
+
+  /**
+   * Pergunta livre do gestor.
+   *
+   * A resposta vem do servidor porque e la que a IA vive - e, principalmente,
+   * porque e la que se controla O QUE e enviado a ela. O contexto montado
+   * pelo VigiaService carrega apenas numeros agregados: tipo, status,
+   * urgencia e prazo. Nenhum relato de denuncia atravessa a fronteira do
+   * sistema, e essa e a diferenca entre usar IA e entregar a base a um
+   * terceiro.
+   */
+  async function perguntar() {
+    const campo = document.getElementById('vigia-input');
+    const alvo  = document.getElementById('vigia-resposta');
+    if (!campo || !alvo) return;
+    const pergunta = campo.value.trim();
+    if (!pergunta) return;
+
+    alvo.className = 'vigia-resposta pensando';
+    alvo.textContent = (typeof I18n !== 'undefined' ? I18n.t('vigia.pensando') : 'Analisando…');
+    try {
+      const resposta = await Backend.perguntarVigia(pergunta);
+      alvo.className = 'vigia-resposta';
+      alvo.textContent = resposta;
+    } catch (e) {
+      alvo.className = 'vigia-resposta erro';
+      alvo.textContent = '❌ ' + e.message;
+    }
+  }
+
+  return { analisar, perguntar };
 })();

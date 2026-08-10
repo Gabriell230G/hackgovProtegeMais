@@ -58,7 +58,10 @@ const Conexao = (() => {
 
     elemento.setAttribute('data-i18n', e.dica[0]);
     elemento.setAttribute('data-i18n-prop', 'title');
-    elemento.title = T(e.dica[0], e.dica[1]);
+    // Mostra QUAL servidor esta respondendo. Num ambiente com homologacao e
+    // producao lado a lado, "API conectada" sozinho nao diz o que importa.
+    const endereco = (typeof Backend !== 'undefined' && Backend.BASE) ? '\n' + Backend.BASE : '';
+    elemento.title = T(e.dica[0], e.dica[1]) + endereco;
   }
 
   function instalar(container) {

@@ -79,24 +79,9 @@ const LGPD = (() => {
   function cifrarMensagensTexto(d) { return d; }  // mensagens do elo ficam em claro (fase atual)
 
   // ── Persistência cifrada (helpers que os módulos podem usar) ──
-  function salvarDenuncias(lista) {
-    try {
-      const cifradas = (lista || []).map(d => {
-        let c = cifrarDenuncia(d);
-        c = cifrarMensagensTexto(c);
-        return c;
-      });
-      localStorage.setItem('denuncias', JSON.stringify(cifradas));
-      return true;
-    } catch (e) { console.warn('[LGPD] erro ao salvar cifrado:', e); return false; }
-  }
 
-  function lerDenuncias() {
-    try {
-      const raw = JSON.parse(localStorage.getItem('denuncias') || '[]');
-      return raw.map(decifrarDenuncia);
-    } catch (_) { return []; }
-  }
+
+
 
   // Migração: cifra denúncias que ainda estão em texto puro
   function migrarParaCifrado() {
@@ -181,7 +166,7 @@ const LGPD = (() => {
 
   return {
     cifrar, decifrar, cifrarDenuncia, decifrarDenuncia,
-    salvarDenuncias, lerDenuncias, migrarParaCifrado,
+    migrarParaCifrado,
     render, init,
   };
 })();

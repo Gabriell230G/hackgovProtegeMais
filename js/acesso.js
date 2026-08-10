@@ -57,9 +57,7 @@ const Acesso = (() => {
   function podeVerAba(aba) {
     return !!(PERMISSOES[papelAtual] && PERMISSOES[papelAtual].abas.indexOf(aba) >= 0);
   }
-  function perfilServidor() {
-    return (typeof Backend !== 'undefined' && Backend.perfilAtual()) || null;
-  }
+
 
   async function definir(novoPapel, btn) {
     const cfg = PERMISSOES[novoPapel];
@@ -169,8 +167,8 @@ const Acesso = (() => {
 
   function init() { aplicar(); }
 
-  return { papel, pode, podeVerAba, perfilServidor, definir, aplicarAutenticado,
-           aplicar, mascarar, init, PERMISSOES };
+  return { papel, pode, podeVerAba, definir, aplicarAutenticado,
+           aplicar, mascarar, init };
 })();
 
 window.Acesso = Acesso;

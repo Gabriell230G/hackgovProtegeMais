@@ -196,14 +196,7 @@ function selectTipo(tipo, evt) {
   scrollToSection('formulario');
 }
 
-function toggleAnon() {
-  const isAnon  = document.getElementById('f-anonimo').checked;
-  const section = document.getElementById('contato-section');
-  if (section) {
-    section.style.opacity       = isAnon ? '0.4' : '1';
-    section.style.pointerEvents = isAnon ? 'none' : 'auto';
-  }
-}
+
 
 // ════════════════════════════════════════════════════════════
 // FUNCIONALIDADE 1 — GEOLOCALIZAÇÃO AUTOMÁTICA
@@ -457,13 +450,7 @@ function toBase64(fileOrBlob) {
   });
 }
 
-// Verifica se o localStorage tem espaço suficiente (~4MB livre)
-function localStorageDisponivel(extraKB = 0) {
-  try {
-    const total = JSON.stringify(localStorage).length;
-    return (total + extraKB * 1024) < 4 * 1024 * 1024; // limite conservador de 4MB
-  } catch { return false; }
-}
+
 
 function handleFiles(files) {
   uploadedFiles = Array.from(files);
@@ -1156,12 +1143,43 @@ function showDashTab(tab, el) {
   }
 }
 
-function updateKPIs(listaFiltrada) {
+/**
+ * Indicadores do topo do painel.
+ *
+ * Com a API no ar os totais vem de GET /api/stats, e nao de uma contagem
+ * feita aqui. Contar no cliente so acerta enquanto o cliente tem TODAS as
+ * denuncias em memoria - e uma base grande nunca cabe numa tela. Deixar o
+ * servidor agregar e o unico jeito de o numero continuar certo quando a
+ * base crescer.
+ *
+ * Quando ha filtro aplicado, a contagem local e a correta: o usuario quer
+ * saber sobre o recorte que esta vendo, nao sobre o canal inteiro.
+ */
+async function updateKPIs(listaFiltrada) {
+  const g = id => document.getElementById(id);
+  const pintar = (total, prior, andamento) => {
+    if (g('kpi-total')) g('kpi-total').textContent = total;
+    if (g('kpi-prior')) g('kpi-prior').textContent = prior;
+    if (g('kpi-and'))   g('kpi-and').textContent   = andamento;
+  };
+
+  if (!listaFiltrada && typeof Backend !== 'undefined') {
+    try {
+      const s = await Backend.estatisticas();
+      if (s && !s.offline && s.porTipo) {
+        const t = s.porTipo, st = s.porStatus || {};
+        pintar(s.total,
+               (t.violencia || 0) + (t.abuso || 0),
+               (st.recebida || 0) + (st.analise || 0));
+        return;
+      }
+    } catch (_) { /* cai para a contagem local */ }
+  }
+
   const all = listaFiltrada || getAllDenuncias();
-  const g   = id => document.getElementById(id);
-  if (g('kpi-total')) g('kpi-total').textContent = all.length;
-  if (g('kpi-prior')) g('kpi-prior').textContent = all.filter(d => d.tipo === 'abuso' || d.tipo === 'violencia').length;
-  if (g('kpi-and'))   g('kpi-and').textContent   = all.filter(d => d.status === 'recebida' || d.status === 'analise').length;
+  pintar(all.length,
+         all.filter(d => d.tipo === 'abuso' || d.tipo === 'violencia').length,
+         all.filter(d => d.status === 'recebida' || d.status === 'analise').length);
 }
 
 // ── Filtros do dashboard ────────────────────────────────────
@@ -1509,19 +1527,29 @@ function renderBacklog(filter = 'all', filtrosAvancados = null) {
   }).join('');
 }
 
+/**
+ * Abre a ficha do caso no painel do orgao.
+ *
+ * Ate aqui esta funcao levava o servidor publico para a tela de consulta
+ * POR PROTOCOLO - a mesma do cidadao. Ele via situacao e linha do tempo, e
+ * nada mais: nem relato, nem endereco, nem a leitura da IA. Alem de
+ * inviabilizar o trabalho, isso fazia com que nenhuma tela chamasse
+ * GET /api/denuncias/{id} e a acao CONSULTA_SENSIVEL nunca disparasse.
+ *
+ * Sem a API no ar nao ha id numerico, e a ficha avisa em vez de abrir vazia.
+ */
 function verDetalhes(id) {
+  const d = (window.denuncias || []).find(x => x.id === id || x.protocolo === id);
+  if (typeof Detalhe !== 'undefined') {
+    Detalhe.abrir(d ? d.apiId : null, id);
+    return;
+  }
   navigate('status');
   document.getElementById('protocolo-input').value = id;
   buscarProtocolo();
 }
 
-function filterTable(filter, el) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  if (el) el.classList.add('active');
-  // Limpa filtros avançados ao usar filtros simples
-  limparFiltros();
-  renderBacklog(filter);
-}
+
 
 // ── Atualizar Status ──────────────────────────────────────────
 function renderStatusTable() {

@@ -131,16 +131,6 @@ const Backend = (() => {
     return nova;
   }
 
-  /**
-   * Lista denúncias. A API agora devolve um envelope de página; esta função
-   * continua entregando um ARRAY para não quebrar quem já a consumia.
-   * Use listarPagina() quando precisar dos metadados de paginação.
-   */
-  async function listarDenuncias(filtros = {}) {
-    const page = await listarPagina({ tamanho: 100, ...filtros });
-    return page.conteudo;
-  }
-
   async function listarPagina(filtros = {}) {
     if (await estaOnline()) {
       const qs = new URLSearchParams(
@@ -464,7 +454,7 @@ const Backend = (() => {
   return {
     BASE, estaOnline, reavaliarConexao,
     login, logout, perfilAtual,
-    criarDenuncia, listarDenuncias, listarPagina, detalharDenuncia, buscarProtocolo,
+    criarDenuncia, listarPagina, detalharDenuncia, buscarProtocolo,
     atualizarDenuncia, excluirDenuncia, mudarStatus, atribuirResponsavel,
     listarEquipe, salvarMembro, removerMembro,
     consultarFila, atenderProximo, consultarPilha, desfazerUltima,

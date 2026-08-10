@@ -654,11 +654,26 @@
             <div class="vigia-id">
               <span class="vigia-avatar">🤖</span>
               <div>
-                <h3>VigIA <span class="vigia-tag">Análise inteligente</span></h3>
+                <h3>VigIA <span class="vigia-tag">Análise inteligente</span>
+                  <span class="vigia-origem" id="vigia-origem"></span></h3>
                 <div class="vigia-sub">Leitura automática das denúncias e recomendações de ação.</div>
               </div>
             </div>
             <button class="vigia-refresh" onclick="VigIA.analisar()">↻ Atualizar análise</button>
+          </div>
+
+          <!-- Pergunta livre: o contexto enviado a IA nao contem relatos -->
+          <div class="vigia-pergunta">
+            <input type="text" id="vigia-input"
+                   placeholder="Pergunte ao VigIA — ex.: onde devo concentrar a equipe esta semana?"
+                   data-i18n="vigia.ph" data-i18n-prop="placeholder"
+                   onkeypress="if(event.key==='Enter')VigIA.perguntar()">
+            <button class="fluxo-btn primario" onclick="VigIA.perguntar()" data-i18n="vigia.perguntar">Perguntar</button>
+          </div>
+          <div class="vigia-resposta" id="vigia-resposta"></div>
+          <div class="vigia-nota" data-i18n="vigia.nota">
+            O contexto enviado à IA contém apenas números agregados — tipo, status, urgência e prazo.
+            Nenhum relato de denúncia sai do sistema.
           </div>
           <div class="vigia-body" id="vigia-body"></div>
         </div>
@@ -1181,6 +1196,7 @@
   <script src="./js/estatistica.js"></script>
   <script src="./js/sincronia.js"></script>
   <script src="./js/evidencias.js"></script>
+  <script src="./js/detalhe.js"></script>
 <script src="./js/main.js"></script>
 
 <script>

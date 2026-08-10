@@ -288,3 +288,98 @@ tr.aud-negado td{ background:#fef2f2; }
   display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:8px;font-size:13px;
 }
 .aviso-file-nota{ display:block;margin-top:8px;font-size:12px;opacity:.8; }
+
+/* ---------- Ficha do caso (painel do órgão) ---------- */
+.det-overlay{
+  display:none;position:fixed;inset:0;background:rgba(15,23,42,.65);
+  z-index:9600;align-items:flex-start;justify-content:center;padding:32px 16px;overflow:auto;
+}
+.det-overlay.active{ display:flex; }
+.det-box{
+  background:#fff;border-radius:16px;max-width:660px;width:100%;
+  padding:24px 26px;box-shadow:0 24px 60px rgba(0,0,0,.35);
+}
+.det-carregando{ padding:26px 4px;text-align:center;color:#64748b;font-size:13.5px;line-height:1.6; }
+.det-carregando.erro{ color:#b91c1c; }
+
+.det-topo{ display:flex;justify-content:space-between;align-items:flex-start;gap:12px; }
+.det-proto{ font-size:20px;font-weight:700;color:#0f172a;font-family:'Sora',sans-serif; }
+.det-sub{ font-size:13px;color:#64748b;margin-top:2px; }
+.det-fechar{
+  border:none;background:#f1f5f9;color:#475569;border-radius:8px;
+  width:30px;height:30px;font-size:15px;cursor:pointer;flex:0 0 auto;
+}
+.det-fechar:hover{ background:#e2e8f0; }
+
+.det-tags{ display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px; }
+.det-tag{
+  font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:999px;
+  background:#f1f5f9;color:#475569;
+}
+.det-tag.urg{ background:#fff7ed;color:#c2410c; }
+.det-tag.anon{ background:#eef2ff;color:#4338ca; }
+.det-tag.status-concluida{ background:#f0fdf4;color:#15803d; }
+.det-tag.status-recebida{ background:#eff6ff;color:#1d4ed8; }
+
+.det-bloco{ margin-top:18px;padding-top:14px;border-top:1px solid #f1f5f9; }
+.det-bloco h4{
+  margin:0 0 8px;font-size:13px;color:#0f172a;text-transform:uppercase;
+  letter-spacing:.4px;display:flex;align-items:center;gap:8px;
+}
+.det-bloco.ia{ background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;border-top:1px solid #e2e8f0; }
+.det-origem{
+  margin-left:auto;font-size:10.5px;font-weight:500;text-transform:none;letter-spacing:0;
+  background:#fff;border:1px solid #e2e8f0;border-radius:5px;padding:1px 7px;color:#64748b;
+}
+.det-relato{ font-size:13.5px;color:#334155;line-height:1.65;margin:0;white-space:pre-wrap; }
+.det-vazio{ color:#94a3b8;font-style:italic;font-size:13px; }
+.det-protegido{ color:#c2410c;font-weight:600;background:#fff7ed;border-radius:6px;padding:1px 8px; }
+
+.det-linha{ display:flex;gap:12px;font-size:13px;padding:7px 0;border-bottom:1px solid #f8fafc; }
+.det-linha > span{ color:#64748b;min-width:120px;flex:0 0 auto; }
+.det-linha > div{ color:#0f172a;word-break:break-word; }
+
+.det-timeline{ display:flex;flex-direction:column;gap:6px; }
+.det-passo{ display:flex;gap:12px;font-size:12.5px;align-items:center; }
+.det-passo-st{ font-weight:600;color:#0f172a;min-width:110px; }
+.det-passo-dt{ color:#94a3b8; }
+
+.det-rot{ display:block;font-size:11.5px;color:#64748b;font-weight:600;margin:10px 0 4px; }
+.det-box select,.det-box textarea,.det-box input[type=text]{
+  width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 11px;
+  font-size:13.5px;font-family:inherit;color:#0f172a;
+}
+.det-nota{ font-size:11.5px;color:#94a3b8;margin-top:8px;line-height:1.5; }
+
+.det-acoes{ display:flex;gap:9px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap; }
+.fluxo-btn.perigo{ background:#fef2f2;border-color:#fecaca;color:#b91c1c; }
+.fluxo-btn.perigo:hover{ background:#fee2e2; }
+
+.det-rodape{
+  margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9;
+  font-size:11.5px;color:#94a3b8;line-height:1.5;text-align:center;
+}
+
+/* ---------- Selo de origem da análise do VigIA ---------- */
+.vigia-origem{
+  font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:999px;
+  margin-left:8px;vertical-align:middle;letter-spacing:.2px;
+}
+.vigia-origem.gemini{ background:rgba(255,255,255,.22);color:#fff; }
+.vigia-origem.regras{ background:rgba(255,255,255,.14);color:#e2e8f0; }
+
+/* ---------- Pergunta livre ao VigIA ---------- */
+.vigia-pergunta{ display:flex;gap:8px;margin-top:14px;flex-wrap:wrap; }
+.vigia-pergunta input{
+  flex:1 1 260px;border:none;border-radius:9px;padding:10px 13px;
+  font-size:13px;font-family:inherit;color:#0f172a;
+}
+.vigia-resposta{
+  margin-top:10px;font-size:13px;line-height:1.6;color:#f1f5f9;
+  background:rgba(255,255,255,.10);border-radius:10px;padding:12px 14px;
+  white-space:pre-wrap;
+}
+.vigia-resposta:empty{ display:none; }
+.vigia-resposta.pensando{ opacity:.7;font-style:italic; }
+.vigia-resposta.erro{ background:rgba(220,38,38,.18);color:#fecaca; }
+.vigia-nota{ margin-top:10px;font-size:11.5px;line-height:1.5;opacity:.75; }
