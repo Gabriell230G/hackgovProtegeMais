@@ -119,7 +119,31 @@ const Sincronia = (() => {
     }
     if (!bruto.length) { daApi = false; return false; }
 
-    const lista = bruto.map(paraTela);
+    // Alguns campos existem SO no cliente e nao tem coluna na API: o codigo
+    // do elo de mao dupla, as mensagens trocadas com a vitima, o nivel de
+    // anonimato e a marca de emergencia. Sobrescrever a lista inteira apagaria
+    // tudo isso a cada carga - o gestor veria a conversa com a vitima sumir ao
+    // trocar de aba. Por isso a carga MESCLA em vez de substituir.
+    const anteriores = new Map();
+    try {
+      const antigo = JSON.parse(localStorage.getItem('denuncias') || '[]');
+      antigo.forEach(d => { if (d && d.id) anteriores.set(d.id, d); });
+    } catch (_) { /* armazenamento indisponivel: segue sem mesclar */ }
+
+    const SO_DO_CLIENTE = ['codigoAcompanhamento', 'mensagens', 'nivelAnonimato',
+                           'emergencia', 'prioridade', 'coordenadas'];
+
+    const lista = bruto.map(api => {
+      const nova = paraTela(api);
+      const antiga = anteriores.get(nova.id);
+      if (antiga) {
+        SO_DO_CLIENTE.forEach(campo => {
+          if (antiga[campo] !== undefined && antiga[campo] !== null) nova[campo] = antiga[campo];
+        });
+      }
+      return nova;
+    });
+
     window.denuncias = lista;
     try { localStorage.setItem('denuncias', JSON.stringify(lista)); } catch (_) {}
 

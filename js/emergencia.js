@@ -102,8 +102,42 @@ const Emergencia = (() => {
     if (btn) btn.disabled = !tipoSelecionado;
   }
 
-  function enviar() {
+  /**
+   * Registra a denuncia de emergencia.
+   *
+   * Com a API no ar o caminho e o mesmo do formulario completo: quem aperta
+   * o botao de emergencia esta em risco AGORA, e uma denuncia que fica presa
+   * no navegador dele nao chega a lugar nenhum. Sem a API, o caminho local
+   * continua valendo - e melhor um registro guardado neste computador do que
+   * nenhum registro.
+   */
+  async function enviar() {
     if (!tipoSelecionado) return;
+
+    if (typeof Backend !== 'undefined' && await Backend.estaOnline()) {
+      const btn = document.getElementById('emerg-btn-enviar');
+      if (btn) { btn.disabled = true; }
+      try {
+        const criada = await Backend.criarDenuncia({
+          tipo: tipoSelecionado,
+          descricao: '[DENUNCIA DE EMERGENCIA] Registro rapido, sem descricao detalhada. '
+                   + 'Localizacao capturada via GPS: ' + (enderecoGPS || 'nao obtida') + '.',
+          estado: (ufGPS || '').toUpperCase().slice(0, 2),
+          cidade: cidadeGPS || '',
+          endereco: enderecoGPS || '',
+          anonimo: true,
+        });
+        if (typeof Sincronia !== 'undefined') Sincronia.hidratar(true);
+        _renderSucesso(criada.protocolo);
+        return;
+      } catch (e) {
+        // Nao perde a denuncia por causa de uma falha de rede: cai para o
+        // caminho local em vez de devolver um erro a quem esta em risco.
+        console.warn('[Emergencia] falha ao registrar pela API, gravando local:', e);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
 
     // Usa o contador global do main.js
     if (typeof protocolCount === 'undefined') { window.protocolCount = 0; }

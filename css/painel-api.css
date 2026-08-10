@@ -273,3 +273,18 @@ tr.aud-negado td{ background:#fef2f2; }
   padding:1px 7px;font-size:13px;cursor:pointer;line-height:1.6;
 }
 .kc-anexos:hover{ border-color:#cbd5e1;background:#f8fafc; }
+
+/* ---------- Aviso de abertura por duplo clique (file://) ---------- */
+.aviso-file{
+  background:#FEF3C7;border-bottom:2px solid #F59E0B;color:#78350F;
+  padding:14px 20px;font-size:13.5px;line-height:1.6;text-align:center;
+  font-family:inherit;
+}
+.aviso-file code{
+  background:#fff;border:1px solid #FCD34D;border-radius:5px;
+  padding:1px 7px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92400E;
+}
+.aviso-file-cmd{
+  display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:8px;font-size:13px;
+}
+.aviso-file-nota{ display:block;margin-top:8px;font-size:12px;opacity:.8; }

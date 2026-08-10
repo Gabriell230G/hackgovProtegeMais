@@ -72,7 +72,36 @@ const Conexao = (() => {
   document.addEventListener('protege:conexao', e => pintar(e.detail.online));
   document.addEventListener('protege:idioma', () => pintar(estado));
 
+  /**
+   * Aviso de abertura por duplo clique (protocolo file://).
+   *
+   * Quem descompacta o ZIP e abre o index.html direto nao ve um erro: ve uma
+   * pagina que carrega e quase funciona. O navegador bloqueia as chamadas a
+   * API por politica de origem, o site cai no modo local e a pessoa conclui
+   * que o sistema esta quebrado - quando o que falta e um servidor HTTP.
+   *
+   * Uma falha silenciosa que parece defeito e pior do que uma mensagem clara.
+   */
+  function avisarAberturaLocal() {
+    if (location.protocol !== 'file:') return;
+
+    const barra = document.createElement('div');
+    barra.className = 'aviso-file';
+    barra.innerHTML =
+      '<b>Esta página foi aberta direto do arquivo.</b> '
+    + 'Nesse modo o navegador bloqueia as chamadas à API e o sistema funciona '
+    + 'apenas com o armazenamento local. Para ver o projeto completo, sirva a pasta '
+    + 'por HTTP e abra <code>http://localhost:5500</code>:'
+    + '<div class="aviso-file-cmd">'
+    +   '<span>na raiz do projeto &nbsp;<code>python -m http.server 5500</code></span>'
+    +   '<span>na pasta <code>backend</code> &nbsp;<code>.\\build.cmd run</code></span>'
+    + '</div>'
+    + '<span class="aviso-file-nota">As instruções completas estão no README.md.</span>';
+    document.body.insertBefore(barra, document.body.firstChild);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    avisarAberturaLocal();
     setTimeout(() => instalar('sidebar-conexao'), 150);
   });
 
