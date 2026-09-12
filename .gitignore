@@ -28,3 +28,5 @@ _to_delete/
 database/massa_gerada.json
 *.bak
 *.orig
+
+css/Claude outputs/

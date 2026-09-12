@@ -20,7 +20,7 @@ public final class MascaraUtil {
         return nome.charAt(0) + "***" + nome.charAt(nome.length() - 1) + "@" + partes[1];
     }
 
-    /** (11) 98765-4321 -> (11) *****-4321 */
+    /** (11) 98765-4321 -> *******4321 (mantem apenas os 4 ultimos digitos) */
     public static String telefone(String valor) {
         if (vazio(valor)) return null;
         String digitos = valor.replaceAll("\\D", "");
