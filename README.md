@@ -20,7 +20,6 @@
 <br>
 
 [![Site publicado](https://img.shields.io/badge/▶_Acessar_o_site-1E5FA8?style=for-the-badge)](https://gabriell230g.github.io/hackgovProtegeMais/)
-[![Vídeo](https://img.shields.io/badge/▶_Vídeo_do_pitch-CC092F?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/SUBSTITUIR-PELO-LINK)
 [![Documentação](https://img.shields.io/badge/📄_Documento_técnico-111827?style=for-the-badge)](docs/Protege_Mais_Fase5_Documento.pdf)
 [![Apresentação](https://img.shields.io/badge/📊_Apresentação-111827?style=for-the-badge)](docs/Protege_Mais_EC_Atividade4_Apresentacao.pdf)
 
