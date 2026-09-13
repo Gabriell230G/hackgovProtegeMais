@@ -87,19 +87,37 @@ const Conexao = (() => {
    */
   function avisarAberturaLocal() {
     if (location.protocol !== 'file:') return;
+    if (sessionStorage.getItem('protege_aviso_file') === 'fechado') return;
 
     const barra = document.createElement('div');
     barra.className = 'aviso-file';
     barra.innerHTML =
-      '<b>Esta página foi aberta direto do arquivo.</b> '
-    + 'Nesse modo o navegador bloqueia as chamadas à API e o sistema funciona '
-    + 'apenas com o armazenamento local. Para ver o projeto completo, sirva a pasta '
-    + 'por HTTP e abra <code>http://localhost:5500</code>:'
-    + '<div class="aviso-file-cmd">'
-    +   '<span>na raiz do projeto &nbsp;<code>python -m http.server 5500</code></span>'
-    +   '<span>na pasta <code>backend</code> &nbsp;<code>.\\build.cmd run</code></span>'
-    + '</div>'
-    + '<span class="aviso-file-nota">As instruções completas estão no README.md.</span>';
+      '<span class="aviso-file-ic">!</span>'
+    + '<span class="aviso-file-txt"><b>Aberto direto do arquivo.</b> '
+    +   'O navegador bloqueia as chamadas à API, então o sistema roda só com o armazenamento local.</span>'
+    + '<button type="button" class="aviso-file-btn" data-acao="abrir">Como servir por HTTP</button>'
+    + '<button type="button" class="aviso-file-x" data-acao="fechar" aria-label="Fechar aviso">&times;</button>'
+    + '<div class="aviso-file-det" hidden>'
+    +   '<span>na raiz do projeto&nbsp; <code>python -m http.server 5500</code></span>'
+    +   '<span>na pasta <code>backend</code>&nbsp; <code>.\\build.cmd run</code></span>'
+    +   '<span>depois abra <code>http://localhost:5500</code></span>'
+    +   '<span class="aviso-file-nota">Instruções completas no README.md.</span>'
+    + '</div>';
+
+    barra.addEventListener('click', ev => {
+      const acao = ev.target.getAttribute && ev.target.getAttribute('data-acao');
+      if (acao === 'fechar') {
+        barra.remove();
+        try { sessionStorage.setItem('protege_aviso_file', 'fechado'); } catch (_) {}
+      }
+      if (acao === 'abrir') {
+        const det = barra.querySelector('.aviso-file-det');
+        const aberto = !det.hidden;
+        det.hidden = aberto;
+        ev.target.textContent = aberto ? 'Como servir por HTTP' : 'Esconder';
+      }
+    });
+
     document.body.insertBefore(barra, document.body.firstChild);
   }
 

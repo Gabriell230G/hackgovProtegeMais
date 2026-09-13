@@ -276,18 +276,35 @@ tr.aud-negado td{ background:#fef2f2; }
 
 /* ---------- Aviso de abertura por duplo clique (file://) ---------- */
 .aviso-file{
-  background:#FEF3C7;border-bottom:2px solid #F59E0B;color:#78350F;
-  padding:14px 20px;font-size:13.5px;line-height:1.6;text-align:center;
-  font-family:inherit;
+  background:#FEF3C7;border-bottom:1px solid #F59E0B;color:#78350F;
+  padding:7px 14px;font-size:12.5px;line-height:1.35;font-family:inherit;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
 }
+.aviso-file-ic{
+  flex:none;width:17px;height:17px;border-radius:50%;background:#F59E0B;color:#fff;
+  font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;
+}
+.aviso-file-txt{ flex:1 1 260px;min-width:0; }
 .aviso-file code{
-  background:#fff;border:1px solid #FCD34D;border-radius:5px;
-  padding:1px 7px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#92400E;
+  background:#fff;border:1px solid #FCD34D;border-radius:4px;
+  padding:1px 6px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#92400E;
 }
-.aviso-file-cmd{
-  display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:8px;font-size:13px;
+.aviso-file-btn{
+  flex:none;background:#fff;border:1px solid #F59E0B;border-radius:6px;color:#92400E;
+  font-family:inherit;font-size:11.5px;font-weight:600;padding:4px 10px;cursor:pointer;
 }
-.aviso-file-nota{ display:block;margin-top:8px;font-size:12px;opacity:.8; }
+.aviso-file-btn:hover{ background:#FDE68A; }
+.aviso-file-x{
+  flex:none;background:none;border:none;color:#92400E;font-size:19px;line-height:1;
+  cursor:pointer;padding:0 2px;opacity:.65;
+}
+.aviso-file-x:hover{ opacity:1; }
+.aviso-file-det{
+  flex:1 1 100%;display:flex;gap:18px;flex-wrap:wrap;align-items:center;
+  margin-top:7px;padding-top:7px;border-top:1px solid #FCD34D;font-size:12px;
+}
+.aviso-file-det[hidden]{ display:none; }
+.aviso-file-nota{ opacity:.8; }
 
 /* ---------- Ficha do caso (painel do órgão) ---------- */
 .det-overlay{
