@@ -71,7 +71,7 @@ const I18n = (() => {
       'status.rec':'Recebida','status.ana':'Em Análise','status.enc':'Encaminhada','status.con':'Concluída',
       'status.conc_sub':'Concluído','status.and_sub':'Em andamento','status.pend_sub':'Pendente',
       'status.det':'Detalhes da Denúncia','status.hist':'Histórico de Atualizações',
-      'footer.priv':'Política de Privacidade','footer.dir':'Diretrizes e Uso Ético',
+      'footer.priv':'Política de Privacidade','footer.dir':'Diretrizes e Uso Ético','footer.video':'Vídeo de apresentação',
       'footer.copy':'Projeto acadêmico de inovação em GovTech. Todos os direitos reservados.',
       // ── Emergência ──
       'emerg.hero_btn':'🚨 ESTÁ ACONTECENDO AGORA?',
@@ -335,7 +335,7 @@ const I18n = (() => {
       'status.rec':'Received','status.ana':'Under Review','status.enc':'Forwarded','status.con':'Concluded',
       'status.conc_sub':'Completed','status.and_sub':'In progress','status.pend_sub':'Pending',
       'status.det':'Report Details','status.hist':'Update History',
-      'footer.priv':'Privacy Policy','footer.dir':'Guidelines and Ethics',
+      'footer.priv':'Privacy Policy','footer.dir':'Guidelines and Ethics','footer.video':'Presentation video',
       'footer.copy':'Academic innovation project in GovTech. All rights reserved.',
       // ── Emergency ──
       'emerg.hero_btn':'🚨 IS IT HAPPENING NOW?',

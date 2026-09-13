@@ -278,31 +278,7 @@
     </div>
   </section>
 
-  <!-- VIDEO DO PITCH — exigido no documento, na apresentacao e no site -->
-  <section class="video-section" id="video">
-    <div class="video-box">
-      <div class="video-ic">🎥</div>
-      <div class="video-txt">
-        <h3 data-i18n="video.titulo">Conheça o Protege+ em 5 minutos</h3>
-        <p data-i18n="video.sub">Apresentação do projeto e demonstração do sistema em funcionamento: registro de denúncia, painel do servidor, fila de priorização e trilha de auditoria.</p>
-      </div>
-      <a class="btn btn-primary" id="link-video"
-         href="https://youtu.be/SUBSTITUIR-PELO-LINK"
-         target="_blank" rel="noopener noreferrer" data-i18n="video.assistir">▶ Assistir no YouTube</a>
-    </div>
-  </section>
-
   <section class="form-section" id="formulario">
-        <div class="react-link">
-          <span class="react-link-ic">⚛️</span>
-          <div>
-            <b data-i18n="react.titulo">Versão em React deste formulário</b>
-            <div data-i18n="react.sub">Mesmo cadastro, implementado como componente React consumindo a mesma API.
-            Útil para comparar as duas abordagens de front-end.</div>
-          </div>
-          <a class="btn btn-secondary btn-sm" href="./formulario-react.html" data-i18n="react.abrir">Abrir</a>
-        </div>
-
     <h2 class="section-title"><span data-i18n="form.titulo">Fazer Denúncia</span></h2>
     <div class="form-container">
       <div class="form-row">
@@ -408,6 +384,16 @@
       </div>
       <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="enviarDenuncia()" data-i18n="form.enviar">📤 Enviar Denúncia</button>
     </div>
+
+    <div class="react-link" style="margin-top:22px">
+      <span class="react-link-ic">⚛️</span>
+      <div>
+        <b data-i18n="react.titulo">Versão em React deste formulário</b>
+        <div data-i18n="react.sub">Mesmo cadastro, implementado como componente React consumindo a mesma API.
+        Útil para comparar as duas abordagens de front-end.</div>
+      </div>
+      <a class="btn btn-secondary btn-sm" href="./formulario-react.html" data-i18n="react.abrir">Abrir</a>
+    </div>
   </section>
 
   <section class="faq-section">
@@ -440,6 +426,8 @@
     <div class="footer-links">
       <a class="footer-link" onclick="navigate('politica')" data-i18n="footer.priv">Política de Privacidade</a>
       <a class="footer-link" onclick="navigate('etica')" data-i18n="footer.dir">Diretrizes e Uso Ético</a>
+      <a class="footer-link" id="link-video" href="https://youtu.be/SUBSTITUIR-PELO-LINK"
+         target="_blank" rel="noopener noreferrer" data-i18n="footer.video">Vídeo de apresentação</a>
     </div>
     <div class="footer-copy">© 2026 Protege+ – <span data-i18n="footer.copy">Projeto acadêmico de inovação em GovTech. Todos os direitos reservados.</span></div>
   </footer>
