@@ -360,26 +360,65 @@ tr.aud-negado td{ background:#fef2f2; }
   font-size:11.5px;color:#94a3b8;line-height:1.5;text-align:center;
 }
 
-/* ---------- Selo de origem da análise do VigIA ---------- */
+/* ---------- Selo de origem da analise do VigIA ----------
+   O painel do VigIA e um cartao CLARO. As cores abaixo nasceram de uma
+   versao em fundo escuro, o que deixava o texto quase invisivel sobre
+   branco. Cada regra agora tem o par claro e o par escuro. */
 .vigia-origem{
   font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:999px;
   margin-left:8px;vertical-align:middle;letter-spacing:.2px;
 }
-.vigia-origem.gemini{ background:rgba(255,255,255,.22);color:#fff; }
-.vigia-origem.regras{ background:rgba(255,255,255,.14);color:#e2e8f0; }
+.vigia-origem.gemini{ background:#DCFCE7;color:#15803D; }
+.vigia-origem.regras{ background:#F1F5F9;color:#475569; }
 
 /* ---------- Pergunta livre ao VigIA ---------- */
 .vigia-pergunta{ display:flex;gap:8px;margin-top:14px;flex-wrap:wrap; }
 .vigia-pergunta input{
-  flex:1 1 260px;border:none;border-radius:9px;padding:10px 13px;
-  font-size:13px;font-family:inherit;color:#0f172a;
+  flex:1 1 260px;border:1.5px solid #E2E8F0;background:#F8FAFC;border-radius:9px;
+  padding:10px 13px;font-size:13px;font-family:inherit;color:#0F172A;
 }
+.vigia-pergunta input::placeholder{ color:#94A3B8; }
+.vigia-pergunta input:focus{ outline:none;border-color:#2563EB;background:#fff; }
 .vigia-resposta{
-  margin-top:10px;font-size:13px;line-height:1.6;color:#f1f5f9;
-  background:rgba(255,255,255,.10);border-radius:10px;padding:12px 14px;
+  margin-top:10px;font-size:13.5px;line-height:1.65;color:#0F172A;
+  background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:13px 15px;
   white-space:pre-wrap;
 }
 .vigia-resposta:empty{ display:none; }
-.vigia-resposta.pensando{ opacity:.7;font-style:italic; }
-.vigia-resposta.erro{ background:rgba(220,38,38,.18);color:#fecaca; }
-.vigia-nota{ margin-top:10px;font-size:11.5px;line-height:1.5;opacity:.75; }
+.vigia-resposta.pensando{ color:#64748B;font-style:italic; }
+.vigia-resposta.erro{ background:#FEF2F2;border-color:#FECACA;color:#B91C1C; }
+.vigia-nota{ margin-top:10px;font-size:11.5px;line-height:1.5;color:#64748B; }
+
+[data-theme="dark"] .vigia-origem.gemini{ background:rgba(74,222,128,.18);color:#86EFAC; }
+[data-theme="dark"] .vigia-origem.regras{ background:rgba(255,255,255,.10);color:#CBD5E1; }
+[data-theme="dark"] .vigia-pergunta input{
+  background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#E2E8F0;
+}
+[data-theme="dark"] .vigia-pergunta input::placeholder{ color:#64748B; }
+[data-theme="dark"] .vigia-resposta{
+  background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10);color:#E2E8F0;
+}
+[data-theme="dark"] .vigia-resposta.pensando{ color:#94A3B8; }
+[data-theme="dark"] .vigia-resposta.erro{ background:rgba(220,38,38,.18);border-color:rgba(220,38,38,.35);color:#FECACA; }
+[data-theme="dark"] .vigia-nota{ color:#94A3B8; }
+
+/* ---------- Modo demonstracao sem servidor (tela de login) ---------- */
+.login-offline{
+  margin-top:18px;padding-top:16px;border-top:1px dashed #CBD5E1;text-align:left;
+}
+.login-offline-tit{
+  font-size:13px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:7px;margin-bottom:6px;
+}
+.login-offline p{ font-size:12px;line-height:1.55;color:#64748B;margin:0 0 10px; }
+.login-offline-conta{
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;color:#475569;
+  background:#F1F5F9;border:1px solid #E2E8F0;border-radius:8px;padding:8px 10px;
+}
+.login-offline-conta strong{ color:#0F172A; }
+[data-theme="dark"] .login-offline{ border-top-color:rgba(255,255,255,.15); }
+[data-theme="dark"] .login-offline-tit{ color:#E2E8F0; }
+[data-theme="dark"] .login-offline p{ color:#94A3B8; }
+[data-theme="dark"] .login-offline-conta{
+  background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:#CBD5E1;
+}
+[data-theme="dark"] .login-offline-conta strong{ color:#F1F5F9; }

@@ -34,6 +34,10 @@
 > Para ver o produto completo, com as **125 denúncias**, o relatório estatístico e a trilha de auditoria, suba o backend
 > seguindo a seção [Como executar](#-como-executar). São dois comandos e menos de cinco minutos.
 >
+> **Sem instalar nada:** a tela de login tem o botão **Entrar em modo demonstração** (ou a conta `offline@protege.gov.br` / `offline123`),
+> que carrega as mesmas **125 denúncias** direto no navegador. Kanban, backlog, mapa e ficha do caso funcionam. Relatório estatístico
+> e trilha de auditoria continuam exigindo a API, porque são calculados no servidor.
+>
 > O documento técnico completo e as apresentações estão em [`docs/`](docs/).
 
 <br>
@@ -158,8 +162,11 @@ Criados automaticamente na primeira execução. Existem quatro para que a **segr
 | 🏛️ | `gestor@protege.gov.br` | `gestor123` | GESTOR | ✅ | ❌ |
 | 👁️ | `atendente@protege.gov.br` | `atendente123` | ATENDENTE | ❌ | ❌ |
 | 🔎 | `auditor@protege.gov.br` | `auditor123` | AUDITOR | ❌ | ✅ |
+| 👁️ | `offline@protege.gov.br` | `offline123` | demonstração **sem servidor** | local | local |
 
 O gestor **não** consulta a trilha de auditoria: quem opera o sistema não fiscaliza o próprio uso dele.
+
+A última linha não é uma conta do servidor. Ela existe para quem quer ver o painel sem subir a API: carrega a base de demonstração no navegador e a etiqueta de conexão continua dizendo `modo local`, para que ninguém confunda dado de vitrine com dado de banco.
 
 ---
 

@@ -7,7 +7,10 @@
 // ── Estado global ────────────────────────────────────────────
 // Carrega do localStorage. Se a camada LGPD existir, decifra os campos
 // sensíveis para a memória (que trabalha sempre em texto claro).
-let denuncias = [];
+var denuncias = [];   // var, e nao let: o Sincronia grava em window.denuncias,
+                      // e so var faz as duas formas apontarem para a mesma ligacao.
+                      // Com let, a carga da API preenchia window.denuncias e o
+                      // painel continuava lendo um array vazio.
 try {
   denuncias = JSON.parse(localStorage.getItem('denuncias') || '[]')
     .filter(d => d && d.id && d.status && d.tipo)
@@ -112,7 +115,12 @@ function getAllDenuncias() {
   // real com mock e o caminho mais curto para um numero de painel que
   // ninguem consegue explicar de onde veio.
   const daApi = typeof Sincronia !== 'undefined' && Sincronia.ativa();
-  const todas = daApi ? [...denuncias] : [...denuncias, ...mockDenuncias];
+  // Fora da API, os exemplos embutidos completam a lista, mas so os que
+  // ainda nao estao nela. Sem esse filtro, um exemplo ja gravado no
+  // navegador apareceria duas vezes e o total do painel mentiria.
+  const jaTem = new Set(denuncias.map(d => d && d.id));
+  const todas = daApi ? [...denuncias]
+                      : [...denuncias, ...mockDenuncias.filter(m => !jaTem.has(m.id))];
   // Decifra campos sensíveis na leitura (se a camada LGPD estiver ativa).
   // decifrar() é seguro em texto não-cifrado (retorna o próprio valor),
   // então mocks em claro passam intactos.
@@ -1084,6 +1092,17 @@ async function fazerLogin() {
   if (err) err.style.display = 'none';
   if (botao) { botao.disabled = true; botao.textContent = I18n.t('login.entrando'); }
 
+  // Conta de demonstracao sem servidor. Existe para que quem avalia o site
+  // publicado veja o painel inteiro sem precisar subir a API. So vale quando
+  // a API esta fora do ar: com o backend no ar, o dado real vem do banco.
+  if (typeof DemoOffline !== 'undefined' && DemoOffline.ehConta(email, senha)) {
+    const online = (typeof Backend !== 'undefined') && await Backend.estaOnline();
+    if (online) return recusar('login.erro.demo_api_no_ar');
+    DemoOffline.ativar();
+    if (botao) { botao.disabled = false; botao.textContent = I18n.t('login.entrar'); }
+    return;
+  }
+
   try {
     if (typeof Backend === 'undefined' || !(await Backend.estaOnline())) {
       return recusar('login.erro.offline');
@@ -1685,3 +1704,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('login-pass')?.addEventListener('keypress',     e => { if (e.key === 'Enter') fazerLogin(); });
   document.getElementById('protocolo-input')?.addEventListener('keypress',e => { if (e.key === 'Enter') buscarProtocolo(); });
 });
+// ════════════════════════════════════════════════════════════
+// MODO DEMONSTRACAO SEM SERVIDOR
+// ════════════════════════════════════════════════════════════
+// Atalho do botao na tela de login. Faz o mesmo que digitar a conta
+// offline, sem exigir que o avaliador copie e cole a credencial.
+async function entrarModoDemo() {
+  if (typeof DemoOffline === 'undefined') return;
+  const online = (typeof Backend !== 'undefined') && await Backend.estaOnline();
+  if (online) {
+    if (typeof showToast === 'function') showToast(I18n.t('login.erro.demo_api_no_ar'));
+    return;
+  }
+  DemoOffline.ativar();
+}

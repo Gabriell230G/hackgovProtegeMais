@@ -550,6 +550,14 @@
           <strong>auditor@protege.gov.br</strong> / auditor123
         </div>
         <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="fazerLogin()" data-i18n="login.entrar">Entrar</button>
+
+        <div class="login-offline">
+          <div class="login-offline-tit"><span>👁️</span> <span data-i18n="login.offline.tit">Sem servidor? Veja assim mesmo</span></div>
+          <p data-i18n="login.offline.sub">O painel completo roda no navegador, com as mesmas 125 denúncias da base de demonstração. Relatório estatístico e trilha de auditoria exigem a API no ar, porque são calculados no servidor.</p>
+          <div class="login-offline-conta"><strong>offline@protege.gov.br</strong> / offline123</div>
+          <button class="btn btn-secondary btn-lg" style="width:100%;justify-content:center;margin-top:10px"
+                  onclick="entrarModoDemo()" data-i18n="login.offline.btn">Entrar em modo demonstração</button>
+        </div>
       </div>
     </div>
     <footer>
@@ -1185,6 +1193,7 @@
   <script src="./js/sincronia.js"></script>
   <script src="./js/evidencias.js"></script>
   <script src="./js/detalhe.js"></script>
+  <script src="./js/demo-offline.js"></script>
 <script src="./js/main.js"></script>
 
 <script>
