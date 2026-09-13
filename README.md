@@ -20,6 +20,8 @@
 <br>
 
 [![Site publicado](https://img.shields.io/badge/▶_Acessar_o_site-1E5FA8?style=for-the-badge)](https://gabriell230g.github.io/hackgovProtegeMais/)
+[![Vídeo Fase 5](https://img.shields.io/badge/▶_Vídeo_·_Fase_5-CC092F?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/DoenYynHA6E)
+[![Vídeo Atividade 4](https://img.shields.io/badge/▶_Vídeo_·_Atividade_4-8B0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/bCIv81vYzPs)
 [![Documentação](https://img.shields.io/badge/📄_Documento_técnico-111827?style=for-the-badge)](docs/Protege_Mais_Fase5_Documento.pdf)
 [![Apresentação](https://img.shields.io/badge/📊_Apresentação-111827?style=for-the-badge)](docs/Protege_Mais_EC_Atividade4_Apresentacao.pdf)
 
@@ -418,6 +420,8 @@ Um dos testes existe por causa de um bug real: a data-hora era gravada com preci
 | [`docs/Protege_Mais_EC_Atividade4_Apresentacao.pdf`](docs/Protege_Mais_EC_Atividade4_Apresentacao.pdf) | Apresentação da Atividade 4 do Enterprise Challenge |
 | [`docs/Protege_Mais_Fase5_Apresentacao.pdf`](docs/Protege_Mais_Fase5_Apresentacao.pdf) | Apresentação da Fase 5 |
 | [`docs/Protege_Mais_Fase5_Apresentacao.html`](docs/Protege_Mais_Fase5_Apresentacao.html) | A mesma apresentação, navegável, com o site embutido ao vivo |
+
+Os dois vídeos de pitch são entregas diferentes do mesmo produto: [Fase 5 da disciplina](https://youtu.be/DoenYynHA6E) e [Atividade 4 do Enterprise Challenge](https://youtu.be/bCIv81vYzPs).
 
 O documento técnico declara, nas seções **5.8** e **6.3** e no **Anexo D.5**, o que ainda **não** está resolvido no sistema. Um documento de segurança que só relata acertos não permite avaliar risco.
 
